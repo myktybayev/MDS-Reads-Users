@@ -1,0 +1,83 @@
+<resources>
+    <string name="app_name">MDS Reads</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="photoLoading">Image uploading...</string>
+    <string name="inetConnection">Check internet connection</string>
+    <string name="enter_group">Enter group name</string>
+    <string name="enter_group_error">fill group name</string>
+    <string name="submit">Отправить</string>
+    <string name="group_added">Group Added successfully</string>
+    <string name="surname_name">Surname, Name</string>
+    <string name="email">Email</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="choose_group">Choose group:</string>
+    <string name="register_user">Register User</string>
+
+    <string name="book_name">Book Name</string>
+    <string name="book_author">Book Author</string>
+    <string name="rating">Rating:</string>
+    <string name="read">Read</string>
+    <string name="upload_book_image">Upload Book Image</string>
+    <string name="enter_book_name">enter book name</string>
+    <string name="enter_author">enter author</string>
+    <string name="enter_desc">enter description</string>
+    <string name="enter_page_number">enter page number</string>
+    <string name="enter_amount_of_book">enter amount of book</string>
+    <string name="scanner_qr_code">scanner book qr Code</string>
+    <string name="add_book">Add Book</string>
+    <string name="all">All</string>
+    <string name="data_loading">Күте тұрыңыз, ақпараттар жүктеліп жатыр...</string>
+
+
+
+
+
+    <string name="enter_code">Введите код из SMS</string>
+    <string name="code_sent">Код выслан на </string>
+
+    <string-array name="months">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+    </string-array>
+
+    <string-array name="months2">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+    </string-array>
+
+    <string-array name="groups">
+        <item>math</item>
+        <item>chemistry</item>
+        <item>biology </item>
+        <item>informatics</item>
+        <item>turkce</item>
+        <item>english</item>
+        <item>physics</item>
+        <item>қазақ тілі</item>
+        <item>қазақ әдебиеті</item>
+        <item>география</item>
+        <item>дүниежүзі тарихы</item>
+        <item>қазақстан тарихы</item>
+    </string-array>
+
+</resources>
