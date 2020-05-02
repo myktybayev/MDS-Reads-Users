@@ -31,14 +31,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import kz.incubator.sdcl.club1.R;
-import kz.incubator.sdcl.club1.groups_menu.Groups;
+import kz.incubator.sdcl.club1.groups_menu.module.Groups;
 import kz.incubator.sdcl.club1.users_list_menu.module.User;
 
 public class AddUser extends AppCompatActivity implements View.OnClickListener {
@@ -122,23 +120,23 @@ public class AddUser extends AppCompatActivity implements View.OnClickListener {
                 uEmail = userEmail.getText().toString();
 
                 if (TextUtils.isEmpty(uNameSurname)) {
-                    nameOfUser.setError("Please fill info");
+                    nameOfUser.setError(getString(R.string.fill_info));
                     return;
                 }
 
                 if (TextUtils.isEmpty(uEmail)) {
-                    userEmail.setError("Please fill email ");
+                    userEmail.setError(getString(R.string.fill_info));
                     return;
                 }
 
                 String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
                 if (!uEmail.matches(emailPattern)) {
-                    userEmail.setError("Please fill email correctly");
+                    userEmail.setError(getString(R.string.fill_email));
                     return;
                 }
 
                 if (TextUtils.isEmpty(uPhone)) {
-                    numberOfUser.setError("Please fill Number ");
+                    numberOfUser.setError(getString(R.string.fill_number));
                     return;
                 }
 
@@ -161,6 +159,8 @@ public class AddUser extends AppCompatActivity implements View.OnClickListener {
                         groupList.add(itemGroup.getGroup_name());
                     }
                     spinnerAdapter.notifyDataSetChanged();
+                }else{
+                    Toast.makeText(AddUser.this, getString(R.string.user_group_not_exist), Toast.LENGTH_SHORT).show();
                 }
             }
             @Override
@@ -189,7 +189,7 @@ public class AddUser extends AppCompatActivity implements View.OnClickListener {
     private void registerUser() {
         progressVisible(true);
 
-        final User userInfo = new User(uNameSurname, uEmail, uPhone, groupId, groupName,"url", "url", 0, 0, 0);
+        final User userInfo = new User(uNameSurname, uEmail, uPhone, groupId, groupName,"url", "url", 0, 0, 0, 0);
 
         databaseReference.child("user_list").child(userInfo.getPhoneNumber()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -197,7 +197,7 @@ public class AddUser extends AppCompatActivity implements View.OnClickListener {
 
                 if (dataSnapshot.exists()) {
 
-                    Toast.makeText(AddUser.this, "User with this Phone number already exist", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddUser.this, getString(R.string.user_phone_duplicate), Toast.LENGTH_SHORT).show();
                     progressVisible(false);
 
                 } else {
@@ -228,15 +228,19 @@ public class AddUser extends AppCompatActivity implements View.OnClickListener {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    Toast.makeText(AddUser.this, "User почтасына ссылка жіберілді", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(AddUser.this, getString(R.string.email_sent), Toast.LENGTH_SHORT).show();
 
 
                                                     databaseReference.child("user_list").child(userInfo.getPhoneNumber()).setValue(userInfo);
                                                     databaseReference.child("user_ver").setValue(getIncreasedVersion());
-
+                                                    increasePersonCount(groupId);
                                                     progressBar.setVisibility(View.GONE);
                                                     logInAdmin();
                                                     finish();
+                                                }else{
+
+                                                    Toast.makeText(AddUser.this, getString(R.string.email_sent_error), Toast.LENGTH_SHORT).show();
+
                                                 }
                                             }
                                         });
@@ -272,6 +276,21 @@ public class AddUser extends AppCompatActivity implements View.OnClickListener {
                             });
 
                 }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void increasePersonCount(final String groupId){
+        databaseReference.child("group_list").child(groupId).child("person_count").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int count = Integer.parseInt(dataSnapshot.getValue().toString());
+                databaseReference.child("group_list").child(groupId).child("person_count").setValue((count+1));
             }
 
             @Override

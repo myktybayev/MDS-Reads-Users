@@ -21,7 +21,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import kz.incubator.sdcl.club1.R;
-import kz.incubator.sdcl.club1.users_list_menu.UserProfileActivity;
+import kz.incubator.sdcl.club1.groups_menu.UserProfileActivity;
 import kz.incubator.sdcl.club1.book_list_menu.module.ReviewInBook;
 
 public class UserReviewsAdapter extends RecyclerView.Adapter<UserReviewsAdapter.MyTViewHolder> {

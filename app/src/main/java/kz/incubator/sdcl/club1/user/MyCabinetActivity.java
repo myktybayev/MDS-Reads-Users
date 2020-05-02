@@ -38,16 +38,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import kz.incubator.sdcl.club1.R;
 import kz.incubator.sdcl.club1.users_list_menu.EditUser;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
-import kz.incubator.sdcl.club1.users_list_menu.profile_fragments.ReadedBookListFragment;
-import kz.incubator.sdcl.club1.users_list_menu.profile_fragments.ReadingBookListFragment;
-import kz.incubator.sdcl.club1.users_list_menu.profile_fragments.RecommendationBookListFragment;
-import kz.incubator.sdcl.club1.users_list_menu.profile_fragments.ReviewsForBookFragment;
+import kz.incubator.sdcl.club1.groups_menu.profile_fragments.ReadedBookListFragment;
+import kz.incubator.sdcl.club1.groups_menu.profile_fragments.ReadingBookListFragment;
+import kz.incubator.sdcl.club1.groups_menu.profile_fragments.RecommendationBookListFragment;
+import kz.incubator.sdcl.club1.groups_menu.profile_fragments.ReviewsForBookFragment;
 import kz.incubator.sdcl.club1.users_list_menu.module.User;
 
 public class MyCabinetActivity extends AppCompatActivity{
     Toolbar toolbar;
     AppBarLayout appBarLayout;
-    TextView username, ticketType, phoneNumber, userEmail;
+    TextView username, ticketType, phoneNumber, userEmail, userRating;
     TextView readBookCount;
     CircleImageView userImage;
     ViewPager viewPager;
@@ -65,6 +65,7 @@ public class MyCabinetActivity extends AppCompatActivity{
     ReadedBookListFragment readedBookListFragment;
     ReviewsForBookFragment reviewsForBookFragment;
     RecommendationBookListFragment recommendationBookListFragment;
+    Bundle bundleFragment;
 
     private int[] tabIcons = {
             R.drawable.ic_class_black_24dp,
@@ -106,6 +107,7 @@ public class MyCabinetActivity extends AppCompatActivity{
         username = findViewById(R.id.userName);
         userEmail = findViewById(R.id.userEmail);
         phoneNumber = findViewById(R.id.phoneNumber);
+        userRating = findViewById(R.id.userRating);
         ticketType = findViewById(R.id.ticketType);
         readBookCount = findViewById(R.id.readBookCount);
         userImage = findViewById(R.id.userImage);
@@ -119,6 +121,15 @@ public class MyCabinetActivity extends AppCompatActivity{
         initUserId();
         initializeUser();
         bookReadedCountListener();
+        bundleFragment = new Bundle();
+        bundleFragment.putString("class", "myCabinet");
+        bundleFragment.putSerializable("user", user);
+
+
+        readingBookListFragment.setArguments(bundleFragment);
+        readedBookListFragment.setArguments(bundleFragment);
+        reviewsForBookFragment.setArguments(bundleFragment);
+        recommendationBookListFragment.setArguments(bundleFragment);
 
         setupViewPager(viewPager);
         setupTabIcons();
@@ -158,7 +169,8 @@ public class MyCabinetActivity extends AppCompatActivity{
                     userEmail.setText(user.getEmail());
                     phoneNumber.setText(user.getPhoneNumber());
                     ticketType.setText(user.getGroupName());
-//                    readBookCount.setText("" + user.getBookCount());
+                    readBookCount.setText("" + user.getBookCount());
+                    userRating.setText("" + user.getRatingInGroups());
                     progressLoading.setVisibility(View.GONE);
 
                 } else {
@@ -173,12 +185,15 @@ public class MyCabinetActivity extends AppCompatActivity{
         });
     }
 
+    int userReadBooksCount = 0;
+    int userReviewsCount = 0;
     public void bookReadedCountListener() {
         mDatabase.child("user_list").child(userId).child("readed").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-                    readBookCount.setText("" + dataSnapshot.getChildrenCount());
+                    userReadBooksCount = (int)dataSnapshot.getChildrenCount();
+                    readBookCount.setText("" + userReadBooksCount);
                     mDatabase.child("user_list").child(userId).child("bookCount").setValue(dataSnapshot.getChildrenCount());
                 }
             }
@@ -195,10 +210,6 @@ public class MyCabinetActivity extends AppCompatActivity{
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
         tabLayout.getTabAt(2).setIcon(tabIcons[2]);
         tabLayout.getTabAt(3).setIcon(tabIcons[3]);
-    }
-
-    public void setBookReadedCount(long bookReadedCount) {
-        readBookCount.setText("" + bookReadedCount);
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -295,6 +306,7 @@ public class MyCabinetActivity extends AppCompatActivity{
         public int getCount() {
             return mFragmentList.size();
         }
+
 
         public void addFragment(Fragment fragment, String one) {
             mFragmentList.add(fragment);

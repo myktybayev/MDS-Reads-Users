@@ -45,13 +45,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kz.incubator.sdcl.club1.R;
+import kz.incubator.sdcl.club1.book_list_menu.module.Book;
 import kz.incubator.sdcl.club1.book_list_menu.one_book_fragments.AlreadyReadFragment;
 import kz.incubator.sdcl.club1.book_list_menu.one_book_fragments.BookDescFragment;
-import kz.incubator.sdcl.club1.book_list_menu.one_book_fragments.UserReviewsFragment;
 import kz.incubator.sdcl.club1.book_list_menu.one_book_fragments.UserReadingFragment;
-import kz.incubator.sdcl.club1.book_list_menu.module.Book;
-
-import static kz.incubator.sdcl.club1.MenuActivity.isAdmin;
+import kz.incubator.sdcl.club1.book_list_menu.one_book_fragments.UserReviewsFragment;
 
 public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickListener {
 
@@ -73,7 +71,7 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
     UserReadingFragment userReadingFragment;
     UserReviewsFragment userReviewsFragment;
     AlreadyReadFragment alreadyReadFragment;
-
+    String currentUserEmail = "empty";
 
     private int[] tabIcons = {
             R.drawable.ic_class_black_24dp,
@@ -106,6 +104,7 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
             userId = currentUser.getPhoneNumber();
         }else{
             userId = currentUser.getDisplayName();
+            currentUserEmail = currentUser.getEmail();
         }
     }
 
@@ -132,8 +131,8 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
         bookRating = findViewById(R.id.bookRating);
 
         bookImage = findViewById(R.id.bookImage);
-        readBookBtn = findViewById(R.id.readBookBtn);
         viewPager = findViewById(R.id.viewPager);
+        readBookBtn = findViewById(R.id.readBookBtn);
 
         tabLayout = findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
@@ -143,7 +142,11 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
         storageReference = FirebaseStorage.getInstance().getReference();
         bookDescFragment = new BookDescFragment();
 
-        readBookBtn.setOnClickListener(this);
+        if(!isAdmin()){
+            readBookBtn.setOnClickListener(this);
+        }else{
+            readBookBtn.setVisibility(View.GONE);
+        }
     }
 
 
@@ -257,7 +260,7 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
         if (isAdmin()) {
             inflater.inflate(R.menu.one_book_menu, menu);
         } else {
-//            inflater.inflate(R.menu.take_book_menu, menu);
+//            inflater.inflate(R.menu.user_review_menu, menu);
         }
         return true;
     }
@@ -269,11 +272,6 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
         int id = item.getItemId();
         if (!isAdmin()) { // users
 
-            switch (id) {
-                case R.id.getBook:
-
-                    break;
-            }
 
         } else { // admin
             switch (id) {
@@ -359,6 +357,15 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isAdmin() {
+
+        if (currentUserEmail != null && currentUserEmail.contains("admin")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void increaseBookVersion() {

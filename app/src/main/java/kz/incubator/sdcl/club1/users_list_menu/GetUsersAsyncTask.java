@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
@@ -20,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import kz.incubator.sdcl.club1.database.StoreDatabase;
-import kz.incubator.sdcl.club1.users_list_menu.adapters.UserListAdapter;
+import kz.incubator.sdcl.club1.groups_menu.adapters.UserListAdapter;
 import kz.incubator.sdcl.club1.users_list_menu.module.User;
 
 import static kz.incubator.sdcl.club1.MenuActivity.setTitle;
@@ -33,6 +32,7 @@ import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_INFO;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_PHONE;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_PHOTO;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_POINT;
+import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_RAINTING_IN_GROUPS;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_REVIEW_SUM;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.TABLE_USER;
 
@@ -98,6 +98,7 @@ public class GetUsersAsyncTask extends AsyncTask<Void, User, Void> {
                         int bookCount = user.getBookCount();
                         int point = user.getPoint();
                         int review_sum = user.getReview_sum();
+                        int ratingInGroups = user.getRatingInGroups();
 
                         ContentValues teacherValue = new ContentValues();
                         teacherValue.put(COLUMN_INFO, info);
@@ -108,13 +109,14 @@ public class GetUsersAsyncTask extends AsyncTask<Void, User, Void> {
                         teacherValue.put(COLUMN_PHOTO, photo);
                         teacherValue.put(COLUMN_POINT, point);
                         teacherValue.put(COLUMN_REVIEW_SUM, review_sum);
+                        teacherValue.put(COLUMN_RAINTING_IN_GROUPS, ratingInGroups);
                         teacherValue.put(COLUMN_IMG_STORAGE_NAME, imgStorageName);
                         teacherValue.put(COLUMN_BCOUNT, bookCount);
 
                         sqdb.insert(TABLE_USER, null, teacherValue);
                     }
                 }
-                Collections.reverse(userList);
+                Collections.sort(userList, User.userPoint);
                 listAdapter = new UserListAdapter(context, userList);
                 progressLoading.setVisibility(View.GONE);
 

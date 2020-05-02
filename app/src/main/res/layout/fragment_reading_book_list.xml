@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".users_list_menu.profile_fragments.RecommendationBookListFragment">
+    tools:context=".groups_menu.profile_fragments.RecommendationBookListFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

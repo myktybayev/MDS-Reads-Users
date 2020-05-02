@@ -13,7 +13,7 @@ import kz.incubator.sdcl.club1.users_list_menu.module.User;
 public class StoreDatabase extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "reading_club.db";
-    private static final int DATABASE_VERSION = 22;
+    private static final int DATABASE_VERSION = 23;
 
     public static final String TABLE_USER = "user_store";
     public static final String TABLE_BOOKS = "book_store";
@@ -28,6 +28,7 @@ public class StoreDatabase extends SQLiteOpenHelper {
     public static final String COLUMN_PHONE = "phone_number";
     public static final String COLUMN_POINT = "point";
     public static final String COLUMN_REVIEW_SUM = "review_sum";
+    public static final String COLUMN_RAINTING_IN_GROUPS = "ratingInGroups";
 
     public static final String TABLE_VER = "versions";
     public static final String COLUMN_USER_VER = "user_ver";
@@ -64,6 +65,7 @@ public class StoreDatabase extends SQLiteOpenHelper {
                 COLUMN_BCOUNT + " INTEGER , " +
                 COLUMN_POINT + " INTEGER , " +
                 COLUMN_REVIEW_SUM + " INTEGER , " +
+                COLUMN_RAINTING_IN_GROUPS + " INTEGER , " +
                 COLUMN_IMG_STORAGE_NAME + " TEXT )");
 
         db.execSQL("CREATE TABLE " + TABLE_BOOKS + "(" +
@@ -118,6 +120,14 @@ public class StoreDatabase extends SQLiteOpenHelper {
 
     }
 
+    public Cursor getBookByFKey(String fkey) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_BOOKS + " WHERE " +
+                COLUMN_FKEY + "=?", new String[]{fkey});
+        return res;
+
+    }
+
     public void addVersions(SQLiteDatabase db) {
         ContentValues versionValues = new ContentValues();
         versionValues.put(COLUMN_USER_VER, "0");
@@ -157,6 +167,9 @@ public class StoreDatabase extends SQLiteOpenHelper {
         updateValues.put(COLUMN_GROUP, user.getGroupName());
         updateValues.put(COLUMN_GROUP_ID, user.getGroup_id());
         updateValues.put(COLUMN_PHONE, user.getPhoneNumber());
+        updateValues.put(COLUMN_POINT, user.getPoint());
+        updateValues.put(COLUMN_REVIEW_SUM, user.getReview_sum());
+        updateValues.put(COLUMN_RAINTING_IN_GROUPS, user.getRatingInGroups());
         updateValues.put(COLUMN_IMG_STORAGE_NAME, user.getImgStorageName());
         updateValues.put(COLUMN_BCOUNT, user.getBookCount());
 

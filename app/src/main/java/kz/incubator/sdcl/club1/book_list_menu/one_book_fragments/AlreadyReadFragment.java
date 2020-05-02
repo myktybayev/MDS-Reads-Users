@@ -29,7 +29,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import kz.incubator.sdcl.club1.R;
-import kz.incubator.sdcl.club1.users_list_menu.UserProfileActivity;
+import kz.incubator.sdcl.club1.groups_menu.UserProfileActivity;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
 import kz.incubator.sdcl.club1.users_list_menu.module.User;
 

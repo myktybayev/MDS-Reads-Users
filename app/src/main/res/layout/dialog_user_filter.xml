@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/ralewaylight"
-            android:text="SORT BY NAME"
+            android:text="@string/sort_name"
             android:textSize="17dp" />
 
     </LinearLayout>
@@ -40,13 +40,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/ralewaylight"
-            android:text="SORT BY READED BOOKS"
+            android:text="@string/sort_book"
             android:textSize="17dp" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/filter_group"
+        android:id="@+id/sort_point"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/ralewaylight"
-            android:text="FILTER BY GROUP"
+            android:text="@string/sort_point"
             android:textSize="17dp" />
 
     </LinearLayout>

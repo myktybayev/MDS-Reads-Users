@@ -11,16 +11,26 @@ public class ReviewInUser implements Serializable {
     String book_id;
     String review_text;
     int user_rate;
+    int admin_rate;
 
     public ReviewInUser() {
 
     }
 
-    public ReviewInUser(String fKey, String book_id, int user_rate, String review_text){
+    public ReviewInUser(String fKey, String book_id, int user_rate, String review_text, int admin_rate) {
         this.fKey = fKey;
         this.book_id = book_id;
         this.review_text = review_text;
         this.user_rate = user_rate;
+        this.admin_rate = admin_rate;
+    }
+
+    public int getAdmin_rate() {
+        return admin_rate;
+    }
+
+    public void setAdmin_rate(int admin_rate) {
+        this.admin_rate = admin_rate;
     }
 
     public int getUser_rate() {

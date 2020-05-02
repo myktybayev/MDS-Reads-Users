@@ -52,8 +52,8 @@ import java.util.Collections;
 
 import kz.incubator.sdcl.club1.R;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
-import kz.incubator.sdcl.club1.groups_menu.Groups;
-import kz.incubator.sdcl.club1.users_list_menu.adapters.UserListAdapter;
+import kz.incubator.sdcl.club1.groups_menu.module.Groups;
+import kz.incubator.sdcl.club1.groups_menu.adapters.UserListAdapter;
 import kz.incubator.sdcl.club1.users_list_menu.module.User;
 
 import static kz.incubator.sdcl.club1.MenuActivity.isAdmin;
@@ -67,6 +67,7 @@ import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_INFO;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_PHONE;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_PHOTO;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_POINT;
+import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_RAINTING_IN_GROUPS;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_REVIEW_SUM;
 
 public class UserFragment extends Fragment implements View.OnClickListener {
@@ -96,7 +97,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_user_list, container, false);
+        view = inflater.inflate(R.layout.activity_user_list, container, false);
 
 
         initView();
@@ -264,7 +265,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
 
         LinearLayout sort_name = sortDialogView.findViewById(R.id.sort_name);
         LinearLayout sort_readed = sortDialogView.findViewById(R.id.sort_readed_books);
-        LinearLayout filter_period = sortDialogView.findViewById(R.id.filter_group);
+        LinearLayout filter_period = sortDialogView.findViewById(R.id.sort_point);
 
         filterSwitch = sortDialogView.findViewById(R.id.filterSwitch);
 
@@ -296,7 +297,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
 
                 break;
 
-            case R.id.filter_group:
+            case R.id.sort_point:
 
 //                ArrayList<User> copyUserList = (ArrayList<User>) userList.clone();
 //                userList.clear();
@@ -528,7 +529,8 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_IMG_STORAGE_NAME)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_BCOUNT)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_POINT)),
-                            userCursor.getInt(userCursor.getColumnIndex(COLUMN_REVIEW_SUM))
+                            userCursor.getInt(userCursor.getColumnIndex(COLUMN_REVIEW_SUM)),
+                            userCursor.getInt(userCursor.getColumnIndex(COLUMN_RAINTING_IN_GROUPS))
                     ));
 
                 }

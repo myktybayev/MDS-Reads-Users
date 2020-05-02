@@ -2,6 +2,7 @@ package kz.incubator.sdcl.club1.groups_menu;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
@@ -37,14 +38,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import kz.incubator.sdcl.club1.R;
+import kz.incubator.sdcl.club1.book_list_menu.one_book_fragments.RecyclerItemClickListener;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
+import kz.incubator.sdcl.club1.groups_menu.adapters.GroupListAdapter;
+import kz.incubator.sdcl.club1.groups_menu.module.Groups;
 import kz.incubator.sdcl.club1.users_list_menu.GetUsersAsyncTask;
 
 public class GroupsFragment extends Fragment implements View.OnClickListener {
     View view;
     ArrayList<Groups> groupList;
-    RecyclerView groupRecyclerView;
     GroupListAdapter groupListAdapter;
     RecyclerView.LayoutManager linearLayoutManager;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -52,13 +57,14 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
     Button addGroupBtn;
     EditText groupName;
     ProgressBar progressBar;
-    FloatingActionButton fabBtn;
     DatabaseReference databaseReference;
 
     StoreDatabase storeDb;
     SQLiteDatabase sqdb;
-    View progressLoading;
 
+    @BindView(R.id.groupRecyclerView) RecyclerView groupRecyclerView;
+    @BindView(R.id.fabBtn) FloatingActionButton fabBtn;
+    @BindView(R.id.llProgressBar) View progressLoading;
 
     public GroupsFragment() {
 
@@ -67,6 +73,7 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_groups, container, false);
+        ButterKnife.bind(this, view);
         initViews();
 
         checkVersion();
@@ -77,21 +84,38 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
     public void initViews() {
         groupList = new ArrayList<>();
         linearLayoutManager = new LinearLayoutManager(getActivity());
-        groupRecyclerView = view.findViewById(R.id.groupRecyclerView);
         groupRecyclerView.setLayoutManager(linearLayoutManager);
         groupRecyclerView.setHasFixedSize(true);
 
-        fabBtn = view.findViewById(R.id.fabBtn);
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
         storeDb = new StoreDatabase(getActivity());
         sqdb = storeDb.getWritableDatabase();
-        progressLoading = view.findViewById(R.id.llProgressBar);
 
         fabBtn.setOnClickListener(this);
 
         groupListAdapter = new GroupListAdapter(getActivity(), groupList);
         groupRecyclerView.setAdapter(groupListAdapter);
+        groupRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getActivity(), groupRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, final int pos) {
+
+                        Intent intent = new Intent(getActivity(), GroupUsersActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("groupName", groupList.get(pos).getGroup_name());
+                        bundle.putSerializable("groupId", groupList.get(pos).getGroup_id());
+                        intent.putExtras(bundle);
+                        getActivity().startActivity(intent);
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                    }
+                })
+        );
+
 
         addGroupsChangeListener();
         setupSwipeRefresh();
@@ -140,6 +164,8 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
     }
 
     String TAG = "GroupsFragment";
+    int groupPointSum = 0;
+    Groups groups;
     public void addGroupsChangeListener(){
         databaseReference.child("group_list").addChildEventListener(new ChildEventListener() {
             @Override
@@ -154,9 +180,8 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
-                Groups groups = dataSnapshot.getValue(Groups.class);
-                Log.i(TAG, "previousChildName: "+groups.getGroup_id());
-
+                groups = dataSnapshot.getValue(Groups.class);
+                Log.i("groups", "GroupsFragment onChildChanged");
                 for(int i = 0; i < groupList.size(); i++){
                     if(groupList.get(i).getGroup_id().equals(groups.getGroup_id())){
                         groupList.set(i, groups);

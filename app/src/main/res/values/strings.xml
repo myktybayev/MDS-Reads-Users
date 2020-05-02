@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">MDS Reads</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="photoLoading">Image uploading...</string>
+    <string name="photoLoading">Image uploading..</string>
     <string name="inetConnection">Check internet connection</string>
     <string name="enter_group">Enter group name</string>
     <string name="enter_group_error">fill group name</string>
@@ -10,8 +10,14 @@
     <string name="surname_name">Surname, Name</string>
     <string name="email">Email</string>
     <string name="phone_number">Phone Number</string>
+    <string name="user_rating">Rating in Group</string>
+    <string name="point">Point</string>
+    <string name="points">Point: </string>
+    <string name="books">Books: </string>
+    <string name="read_books">Read Books</string>
     <string name="choose_group">Choose group:</string>
     <string name="register_user">Register User</string>
+    <string name="admin_rate_txt">Admin rate: </string>
 
     <string name="book_name">Book Name</string>
     <string name="book_author">Book Author</string>
@@ -26,14 +32,76 @@
     <string name="scanner_qr_code">scanner book qr Code</string>
     <string name="add_book">Add Book</string>
     <string name="all">All</string>
-    <string name="data_loading">Күте тұрыңыз, ақпараттар жүктеліп жатыр...</string>
-
-
-
-
+    <string name="data_loading">Күте тұрыңыз, ақпараттар жүктеліп жатыр..</string>
 
     <string name="enter_code">Введите код из SMS</string>
     <string name="code_sent">Код выслан на </string>
+    <string name="email_sent">User почтасына ссылка жіберілді</string>
+    <string name="email_sent_error">Почтаға ссылка жіберуде қате болды, басынан қайталаңыз</string>
+    <string name="user_phone_duplicate">"User with this Phone number already exist</string>
+    <string name="user_group_not_exist">Қолданушылар группасы енгізілмеген</string>
+    <string name="fill_info">Please fill info</string>
+    <string name="fill_email">Please fill email correctly</string>
+    <string name="fill_number">Please fill Number</string>
+    <string name="write_a_review">Write a Review</string>
+    <string name="rate_it">Rate it</string>
+    <string name="user_rated">User rated</string>
+    <string name="admin_rate">Admin rate review</string>
+    <string name="save">Save</string>
+    <string name="rating_error">Rating or Review text invalid</string>
+    <string name="sort_name">SORT BY NAME</string>
+    <string name="sort_book">SORT BY READ BOOKS</string>
+    <string name="sort_point">SORT BY POINT</string>
+
+    <integer-array name="gradientStore">
+        <item>@drawable/gradient1</item>
+        <item>@drawable/gradient2</item>
+        <item>@drawable/gradient3</item>
+        <item>@drawable/gradient4</item>
+        <item>@drawable/gradient5</item>
+        <item>@drawable/gradient6</item>
+        <item>@drawable/gradient7</item>
+        <item>@drawable/gradient8</item>
+        <item>@drawable/gradient1</item>
+        <item>@drawable/gradient2</item>
+        <item>@drawable/gradient3</item>
+        <item>@drawable/gradient4</item>
+        <item>@drawable/gradient5</item>
+        <item>@drawable/gradient6</item>
+        <item>@drawable/gradient7</item>
+        <item>@drawable/gradient8</item>
+        <item>@drawable/gradient1</item>
+        <item>@drawable/gradient2</item>
+        <item>@drawable/gradient3</item>
+        <item>@drawable/gradient4</item>
+        <item>@drawable/gradient5</item>
+        <item>@drawable/gradient6</item>
+        <item>@drawable/gradient7</item>
+        <item>@drawable/gradient8</item>
+    </integer-array>
+
+    <integer-array name="subjectStore">
+        <item>@drawable/subject1</item>
+        <item>@drawable/subject2</item>
+        <item>@drawable/subject3</item>
+        <item>@drawable/subject4</item>
+        <item>@drawable/subject5</item>
+        <item>@drawable/subject1</item>
+        <item>@drawable/subject2</item>
+        <item>@drawable/subject3</item>
+        <item>@drawable/subject4</item>
+        <item>@drawable/subject5</item>
+        <item>@drawable/subject1</item>
+        <item>@drawable/subject2</item>
+        <item>@drawable/subject3</item>
+        <item>@drawable/subject4</item>
+        <item>@drawable/subject5</item>
+        <item>@drawable/subject1</item>
+        <item>@drawable/subject2</item>
+        <item>@drawable/subject3</item>
+        <item>@drawable/subject4</item>
+        <item>@drawable/subject5</item>
+    </integer-array>
 
     <string-array name="months">
         <item>1</item>

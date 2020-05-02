@@ -21,15 +21,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import kz.incubator.sdcl.club1.authentications.LoginByPhoneActivity;
 import kz.incubator.sdcl.club1.about_us_menu.AboutUsFragment;
-import kz.incubator.sdcl.club1.rules_menu.RuleFragment;
-import kz.incubator.sdcl.club1.database.StoreDatabase;
+import kz.incubator.sdcl.club1.authentications.LoginByPhoneActivity;
 import kz.incubator.sdcl.club1.book_list_menu.BookListFragment;
-import kz.incubator.sdcl.club1.users_list_menu.UserFragment;
+import kz.incubator.sdcl.club1.database.StoreDatabase;
 import kz.incubator.sdcl.club1.groups_menu.GroupsFragment;
-import kz.incubator.sdcl.club1.book_list_menu.module.Book;
+import kz.incubator.sdcl.club1.rules_menu.RuleFragment;
 import kz.incubator.sdcl.club1.user.MyCabinetActivity;
+import kz.incubator.sdcl.club1.users_list_menu.UserFragment;
 
 public class MenuActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -43,9 +42,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     BookListFragment bookListFragment;
     RuleFragment ruleFragment;
     FirebaseUser currentUser;
-    Book book;
     static String currentUserEmail = "empty";
-    String userLoginType;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

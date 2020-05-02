@@ -151,8 +151,8 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/quick"
                     android:hint="@string/enter_amount_of_book"
-                    android:text="1"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    android:text="1" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -164,10 +164,10 @@
 
             <Button
                 android:id="@+id/addBook"
+                style="@style/ButtonSubmitStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:background="@color/back"
                 android:fontFamily="@font/qbold"
                 android:text="@string/add_book"
                 android:textColor="@color/white" />

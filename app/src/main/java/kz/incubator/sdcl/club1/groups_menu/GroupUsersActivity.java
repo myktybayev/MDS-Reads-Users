@@ -1,7 +1,6 @@
 package kz.incubator.sdcl.club1.groups_menu;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,8 +9,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -19,15 +18,14 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Switch;
@@ -48,14 +46,14 @@ import java.util.Calendar;
 import java.util.Collections;
 
 import kz.incubator.sdcl.club1.R;
+import kz.incubator.sdcl.club1.book_list_menu.one_book_fragments.RecyclerItemClickListener;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
+import kz.incubator.sdcl.club1.groups_menu.adapters.UserListAdapter;
+import kz.incubator.sdcl.club1.groups_menu.module.Groups;
 import kz.incubator.sdcl.club1.users_list_menu.AddUser;
 import kz.incubator.sdcl.club1.users_list_menu.GetUsersAsyncTask;
-import kz.incubator.sdcl.club1.users_list_menu.adapters.UserListAdapter;
 import kz.incubator.sdcl.club1.users_list_menu.module.User;
 
-import static kz.incubator.sdcl.club1.MenuActivity.isAdmin;
-import static kz.incubator.sdcl.club1.MenuActivity.setTitle;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BCOUNT;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_EMAIL;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_GROUP;
@@ -65,9 +63,13 @@ import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_INFO;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_PHONE;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_PHOTO;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_POINT;
+import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_RAINTING_IN_GROUPS;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_REVIEW_SUM;
 
 public class GroupUsersActivity extends AppCompatActivity implements View.OnClickListener {
+
+    Toolbar toolbar;
+    AppBarLayout appBarLayout;
     DatabaseReference mDatabaseRef, userRef;
     RecyclerView recyclerView;
     LayoutAnimationController animation;
@@ -89,14 +91,16 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
     View sortDialogView;
     AlertDialog sortDialog;
     Switch filterSwitch;
-    String gId;
+    String gId, gName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_user_list);
+        setContentView(R.layout.activity_user_list);
 
         Intent intent = getIntent();
+        gName = intent.getStringExtra("groupName");
         gId = intent.getStringExtra("groupId");
 
         initView();
@@ -111,6 +115,12 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
         storeDb = new StoreDatabase(this);
         sqdb = storeDb.getWritableDatabase();
 
+        toolbar = findViewById(R.id.toolbars);
+        appBarLayout = findViewById(R.id.app_bar);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(gName+" users");
         userRef = mDatabaseRef.child("user_list");
         userList = new ArrayList<>();
         groupList = new ArrayList<>();
@@ -127,6 +137,7 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
 
         progressLoading = findViewById(R.id.llProgressBar);
         fabBtn = findViewById(R.id.fabBtn);
+        fabBtn.setOnClickListener(this);
 
         searchView = findViewById(R.id.searchView);
         userListCopy = new ArrayList<>();
@@ -143,8 +154,32 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
             }
         });
 
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, final int pos) {
+
+                        Intent intent = new Intent(GroupUsersActivity.this, UserProfileActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("user", userList.get(pos));
+                        intent.putExtras(bundle);
+                        startActivityForResult(intent, 101);
+
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                    }
+                })
+        );
+
+
         setupSwipeRefresh();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) { }
 
     @Override
     public void onClick(View v) {
@@ -169,19 +204,9 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
 
                 break;
 
-            case R.id.filter_group:
+            case R.id.sort_point:
 
-//                ArrayList<User> copyUserList = (ArrayList<User>) userList.clone();
-//                userList.clear();
-//
-//                for (User user : copyUserList) {
-//                    String abone = checkAbone(user.getGroup());
-//
-//                    if (abone.contains("subscription")) {
-//                        userList.add(user);
-//                    }
-//                }
-
+                Collections.sort(userList, User.userPoint);
                 sortDialog.dismiss();
                 break;
 
@@ -197,6 +222,7 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
         mSwipeRefreshLayout.setRefreshing(false);
         progressLoading.setVisibility(View.GONE);
         listAdapter = new UserListAdapter(this, userList);
+
     }
 
     public void refreshUsersFromFirebase(String version) {
@@ -204,6 +230,7 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
+    int c = 0;
     public void addListener() {
         userRef.addChildEventListener(new ChildEventListener() {
             @Override
@@ -214,6 +241,18 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
                 User user = dataSnapshot.getValue(User.class);
+                for(int i = 0; i < userList.size(); i++) {
+                    User userInList = userList.get(i);
+
+                    assert user != null;
+                    if(userInList!=null && userInList.getPhoneNumber().equals(user.getPhoneNumber())) {
+                        userList.set(i, user);
+
+                        Collections.sort(userList, User.userPoint);
+                        listAdapter.notifyDataSetChanged();
+                        break;
+                    }
+                }
                 storeDb.updateUser(sqdb, user);
 
             }
@@ -235,6 +274,14 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
 
             }
         });
+
+
+//        mDatabase.child("group_list").child(user.getGroup_id()).child("sum_point").setValue(groupPointSum).addOnCompleteListener(new OnCompleteListener<Void>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//                finish();
+//            }
+//        });
 
     }
 
@@ -343,13 +390,13 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
 
         LinearLayout sort_name = sortDialogView.findViewById(R.id.sort_name);
         LinearLayout sort_readed = sortDialogView.findViewById(R.id.sort_readed_books);
-        LinearLayout filter_period = sortDialogView.findViewById(R.id.filter_group);
+        LinearLayout sort_point = sortDialogView.findViewById(R.id.sort_point);
 
         filterSwitch = sortDialogView.findViewById(R.id.filterSwitch);
 
         sort_name.setOnClickListener(this);
         sort_readed.setOnClickListener(this);
-        filter_period.setOnClickListener(this);
+        sort_point.setOnClickListener(this);
 
         sortDialog.setView(sortDialogView);
 
@@ -413,6 +460,11 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
     public class BackgroundTaskForUserFill extends AsyncTask<Void, Void, Void> {
         RecyclerView recyclerView;
         ProgressBar progressBar;
@@ -457,14 +509,15 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_IMG_STORAGE_NAME)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_BCOUNT)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_POINT)),
-                            userCursor.getInt(userCursor.getColumnIndex(COLUMN_REVIEW_SUM))
+                            userCursor.getInt(userCursor.getColumnIndex(COLUMN_REVIEW_SUM)),
+                            userCursor.getInt(userCursor.getColumnIndex(COLUMN_RAINTING_IN_GROUPS))
                     ));
 
                 }
 
                 userListCopy = (ArrayList<User>) userList.clone();
-                Collections.reverse(userListCopy);
 
+                Collections.sort(userListCopy, User.userPoint);
             }
 
             return null;
@@ -478,7 +531,7 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            Collections.reverse(userList);
+            Collections.sort(userList, User.userPoint);
             recyclerView.setAdapter(listAdapter);
             progressBar.setVisibility(View.GONE);
 

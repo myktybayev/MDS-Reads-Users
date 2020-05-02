@@ -20,7 +20,7 @@
 //import java.util.Collections;
 //
 //import kz.incubator.sdcl.club1.database.StoreDatabase;
-//import kz.incubator.sdcl.club1.users_list_menu.adapters.UserListAdapter;
+//import kz.incubator.sdcl.club1.groups_menu.adapters.UserListAdapter;
 //import kz.incubator.sdcl.club1.users_list_menu.module.User;
 //
 //import static kz.incubator.sdcl.club1.MenuActivity.setTitle;

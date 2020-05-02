@@ -48,16 +48,28 @@
             android:textSize="11dp" />
 
         <TextView
-            android:id="@+id/userGroup"
+            android:id="@+id/userPoint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:fontFamily="@font/ralewaybold"
             android:gravity="center_horizontal"
-            android:text="12.3.14"
+            android:text="Point: 0"
             android:textColor="@color/bronze2"
             android:textSize="10dp"
             android:textStyle="bold" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/userRating"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fontFamily="@font/quick"
+        android:layout_weight="3"
+        android:text="1"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="30dp" />
+
 </LinearLayout>
