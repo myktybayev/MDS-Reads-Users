@@ -121,8 +121,10 @@ public class EditUser extends AppCompatActivity {
             nameOfUser.setText(user.getInfo());
             photoUrl = user.getPhoto();
 
-            Glide.with(this)
-                    .load(photoUrl)
+            Glide.with(getApplicationContext())
+                    .load(user.getPhoto())
+                    .crossFade()
+                    .dontAnimate()
                     .placeholder(R.drawable.user_def)
                     .into(userPhoto);
         }
@@ -166,7 +168,7 @@ public class EditUser extends AppCompatActivity {
 
         user.setInfo(uName);
         databaseReference.child("user_ver").setValue(getIncreasedVersion());
-        databaseReference.child("user_list").child(user.getPhoneNumber()).setValue(user);
+        databaseReference.child("user_list").child(user.getPhoneNumber()).child("info").setValue(uName);
 
         saveUser.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
@@ -204,8 +206,12 @@ public class EditUser extends AppCompatActivity {
 
                             if (downloadUri != null) {
 
+                                databaseReference.child("user_list").child(user.getPhoneNumber()).child("photo").setValue(downloadUri);
+                                databaseReference.child("user_list").child(user.getPhoneNumber()).child("imgStorageName").setValue(imgStorageName);
+
                                 user.setPhoto(downloadUri);
                                 user.setImgStorageName(imgStorageName);
+
                                 saveUserChanges();
 
                             }
@@ -237,8 +243,8 @@ public class EditUser extends AppCompatActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 fileUri = result.getUri();
-                putPhoto.setImageURI(fileUri);
-                putPhoto.setVisibility(View.VISIBLE);
+                userPhoto.setImageURI(fileUri);
+                userPhoto.setVisibility(View.VISIBLE);
                 changeIt.setText("Change Image");
 
                 photoSelected = true;

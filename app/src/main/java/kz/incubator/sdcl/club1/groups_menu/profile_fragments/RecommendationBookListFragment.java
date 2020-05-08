@@ -41,8 +41,9 @@ public class RecommendationBookListFragment extends Fragment {
     ArrayList<String> keys = new ArrayList<>();
     String userId;
     FirebaseUser currentUser;
+    String classType;
 
-    public RecommendationBookListFragment(){
+    public RecommendationBookListFragment() {
 
     }
 
@@ -55,10 +56,11 @@ public class RecommendationBookListFragment extends Fragment {
         initializeFloatingActionButton();
         return view;
     }
+
     User user;
+
     public void initUserId() {
         Bundle bundle = this.getArguments();
-        String classType;
         userId = "";
 
         if (bundle != null) {
@@ -81,21 +83,23 @@ public class RecommendationBookListFragment extends Fragment {
         }
     }
 
-    public void initializeRecyclerView(){
+    public void initializeRecyclerView() {
         recyclerView = view.findViewById(R.id.recyclerView);
         Collections.reverse(bookList);
-        adapter = new RecommendationBookListAdapter(getActivity(),bookList);
+        adapter = new RecommendationBookListAdapter(getActivity(), bookList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
     }
 
-    public void initializeFloatingActionButton(){
+    public void initializeFloatingActionButton() {
         fab = view.findViewById(R.id.fab);
+
+        if (classType.equals("userProfile")) fab.setVisibility(View.INVISIBLE);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                View alerDialogView = getLayoutInflater().inflate(R.layout.create_recommendation_book,null);
+                View alerDialogView = getLayoutInflater().inflate(R.layout.create_recommendation_book, null);
                 final AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
                 final TextView author = alerDialogView.findViewById(R.id.AuthorOfBook);
                 final TextView name = alerDialogView.findViewById(R.id.BookName);
@@ -103,9 +107,9 @@ public class RecommendationBookListFragment extends Fragment {
                 btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if(!author.getText().toString().equals("") && !name.getText().toString().equals("")){
+                        if (!author.getText().toString().equals("") && !name.getText().toString().equals("")) {
                             String bookId = getIdNumber();
-                            Book book = new Book(bookId,author.getText().toString(),name.getText().toString());
+                            Book book = new Book(bookId, author.getText().toString(), name.getText().toString());
                             mDatabase.child("user_list").child(userId).child("recommendations").child(bookId).setValue(book);
                             alertDialog.dismiss();
                         }
@@ -125,7 +129,7 @@ public class RecommendationBookListFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 keys.clear();
                 bookList.clear();
-                for (DataSnapshot data:dataSnapshot.getChildren()){
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
                     Book book = data.getValue(Book.class);
                     bookList.add(book);
                 }

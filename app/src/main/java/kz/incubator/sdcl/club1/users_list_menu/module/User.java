@@ -15,6 +15,7 @@ public class  User implements Serializable {
     String group_id;
     String groupName;
     String email;
+    String enterDate;
     int point;
     int review_sum;
     int bookCount;
@@ -24,7 +25,7 @@ public class  User implements Serializable {
 
     }
 
-    public User(String info, String email, String phoneNumber, String group_id, String groupName, String photo, String imgStorageName, int bookCount, int point, int review_sum, int ratingInGroups){
+    public User(String info, String email, String phoneNumber, String group_id, String groupName, String photo, String enterDate, String imgStorageName, int bookCount, int point, int review_sum, int ratingInGroups){
         this.info = info;
         this.group_id = group_id;
         this.groupName = groupName;
@@ -36,6 +37,7 @@ public class  User implements Serializable {
         this.point = point;
         this.review_sum = review_sum;
         this.ratingInGroups = ratingInGroups;
+        this.enterDate = enterDate;
     }
 
     public static Comparator<User> userNameComprator = new Comparator<User>() {
@@ -83,6 +85,14 @@ public class  User implements Serializable {
             //return StudentName2.compareTo(StudentName1);
         }
     };
+
+    public String getEnterDate() {
+        return enterDate;
+    }
+
+    public void setEnterDate(String enterDate) {
+        this.enterDate = enterDate;
+    }
 
     public int getRatingInGroups() {
         return ratingInGroups;

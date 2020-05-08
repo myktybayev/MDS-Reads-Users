@@ -52,6 +52,9 @@
     <string name="sort_name">SORT BY NAME</string>
     <string name="sort_book">SORT BY READ BOOKS</string>
     <string name="sort_point">SORT BY POINT</string>
+    <string name="not_logged_in_yet">not logged in yet</string>
+    <string name="re_calc_points">Группалардың және қолданушылардың ұпайлары есептелуде, күте тұрыңыз..</string>
+    <string name="rated_successfully">rated successfully</string>
 
     <integer-array name="gradientStore">
         <item>@drawable/gradient1</item>
@@ -133,19 +136,20 @@
         <item>12</item>
     </string-array>
 
-    <string-array name="groups">
-        <item>math</item>
-        <item>chemistry</item>
-        <item>biology </item>
-        <item>informatics</item>
-        <item>turkce</item>
-        <item>english</item>
-        <item>physics</item>
-        <item>қазақ тілі</item>
-        <item>қазақ әдебиеті</item>
-        <item>география</item>
-        <item>дүниежүзі тарихы</item>
-        <item>қазақстан тарихы</item>
+    <string-array name="monthStore">
+        <item>Қаңтар</item>
+        <item>Ақпан</item>
+        <item>Наурыз</item>
+        <item>Сәуір</item>
+        <item>Мамыр</item>
+        <item>Маусым</item>
+        <item>Шілде</item>
+        <item>Тамыз</item>
+        <item>Қыркүйек</item>
+        <item>Қазан</item>
+        <item>Қараша</item>
+        <item>Желтоқсан</item>
     </string-array>
+
 
 </resources>

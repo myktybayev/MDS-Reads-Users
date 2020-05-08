@@ -67,7 +67,7 @@ public class UserReviewsAdapter extends RecyclerView.Adapter<UserReviewsAdapter.
         final ReviewInBook review = userList.get(position);
 
         holder.userName.setText(review.getUser().getInfo());
-        Glide.with(context)
+        Glide.with(context.getApplicationContext())
                 .load(review.getUser().getPhoto())
                 .placeholder(R.drawable.user_def)
                 .into(holder.person_photo);

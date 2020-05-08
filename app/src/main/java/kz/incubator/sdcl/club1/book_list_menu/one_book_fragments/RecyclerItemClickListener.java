@@ -1,6 +1,5 @@
 package kz.incubator.sdcl.club1.book_list_menu.one_book_fragments;
 
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
@@ -11,9 +10,9 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
     private OnItemClickListener mListener;
 
     public interface OnItemClickListener {
-        public void onItemClick(View view, int position);
+        void onItemClick(View view, int position);
 
-        public void onLongItemClick(View view, int position);
+        void onLongItemClick(View view, int position);
     }
 
     GestureDetector mGestureDetector;
@@ -33,6 +32,8 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
                     mListener.onLongItemClick(child, recyclerView.getChildAdapterPosition(child));
                 }
             }
+
+
         });
     }
 
@@ -48,6 +49,10 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
 
     @Override
     public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) {
+        View childView = view.findChildViewUnder(motionEvent.getX(), motionEvent.getY());
+        if (childView != null && mListener != null && mGestureDetector.onTouchEvent(motionEvent)) {
+            mListener.onItemClick(childView, view.getChildAdapterPosition(childView));
+        }
     }
 
     @Override

@@ -94,6 +94,7 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
 
         fabBtn.setOnClickListener(this);
 
+        addGroupsChangeListener();
         groupListAdapter = new GroupListAdapter(getActivity(), groupList);
         groupRecyclerView.setAdapter(groupListAdapter);
         groupRecyclerView.addOnItemTouchListener(
@@ -117,7 +118,6 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
         );
 
 
-        addGroupsChangeListener();
         setupSwipeRefresh();
     }
 

@@ -118,7 +118,7 @@ public class EditBook extends AppCompatActivity {
             book_qr_code = book.getQr_code();
             imgStorageName = book.getImgStorageName();
 
-            Glide.with(this)
+            Glide.with(getApplicationContext())
                     .load(book.getPhoto())
                     .placeholder(R.drawable.item_book)
                     .into(bookImage);

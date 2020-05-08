@@ -158,7 +158,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
         if (bundle != null && u != null) {
 
-            Glide.with(this)
+            Glide.with(getApplicationContext())
                     .load(u.getPhoto())
                     .placeholder(R.drawable.user_def)
                     .into(userImage);

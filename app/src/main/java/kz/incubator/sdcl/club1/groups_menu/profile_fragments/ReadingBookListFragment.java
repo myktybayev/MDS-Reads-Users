@@ -61,21 +61,23 @@ public class ReadingBookListFragment extends Fragment implements RatingDialogLis
     DatabaseReference mDatabase;
     ProgressBar progressBar;
     TextView checkIsEmpty;
-    long bCount;
     StoreDatabase storeDb;
     SQLiteDatabase sqdb;
     String TABLE_BOOKS = "book_store";
     static Activity activity;
     String userId;
+    FirebaseUser currentUser;
+    User user;
+    String classType;
 
-
-    public ReadingBookListFragment() {}
+    public ReadingBookListFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_reading_book_list, container, false);
-        initialize();
         initUserId();
+        initialize();
 
         downloadReadBooks();
         return view;
@@ -103,20 +105,18 @@ public class ReadingBookListFragment extends Fragment implements RatingDialogLis
 
     }
 
-    FirebaseUser currentUser;
-    User user;
     public void initUserId() {
         Bundle bundle = this.getArguments();
-        String classType;
         userId = "";
 
         if (bundle != null) {
             classType = bundle.getString("class");
+            user = (User) bundle.getSerializable("user");
 
             if (classType != null && classType.equals("myCabinet")) {
-
                 currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
+                assert currentUser != null;
                 if (currentUser.getPhoneNumber() != null && currentUser.getPhoneNumber().length() > 0) { // phone login
                     userId = currentUser.getPhoneNumber();
                 } else {
@@ -124,104 +124,100 @@ public class ReadingBookListFragment extends Fragment implements RatingDialogLis
                 }
 
             } else if (classType != null && classType.equals("userProfile")) {
-                user = (User) bundle.getSerializable("user");
+                assert user != null;
                 userId = user.getPhoneNumber();
             }
         }
     }
 
     private void addListener() {
-        bookAdapter.setOnItemClickListener(new ItemClickListener() {
-            @Override
-            public void onItemClick(View v, final int pos) {
-                LayoutInflater factory = LayoutInflater.from(getActivity());
+        if (classType.equals("userProfile")) {
+            bookAdapter.setOnItemClickListener(new ItemClickListener() {
+                @Override
+                public void onItemClick(View v, int pos) {
+                    //nothing to do
+                }
+            });
+        } else {
+            bookAdapter.setOnItemClickListener(new ItemClickListener() {
+                @Override
+                public void onItemClick(View v, final int pos) {
+                    LayoutInflater factory = LayoutInflater.from(getActivity());
 
-                final View deleteDialogView = factory.inflate(R.layout.dialog_for_reading_book, null);
-                final AlertDialog deleteDialog = new AlertDialog.Builder(getActivity()).create();
+                    final View deleteDialogView = factory.inflate(R.layout.dialog_for_reading_book, null);
+                    final AlertDialog deleteDialog = new AlertDialog.Builder(getActivity()).create();
 
-                LinearLayout delete = deleteDialogView.findViewById(R.id.Delete);
-                LinearLayout finished = deleteDialogView.findViewById(R.id.Finished);
-                final String bookId = bookList.get(pos).getFirebaseKey();
-                delete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                    LinearLayout delete = deleteDialogView.findViewById(R.id.Delete);
+                    LinearLayout finished = deleteDialogView.findViewById(R.id.Finished);
+                    final String bookId = bookList.get(pos).getFirebaseKey();
+                    delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
 
-                        new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme)
-                                .setTitle("Not finished book: " + bookList.get(pos).getName())
-                                .setMessage("Are you sure to delete this book?")
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @SuppressLint("MissingPermission")
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        mDatabase.child("user_list").child(userId).child("reading").child(bookId).removeValue();
-                                        increaseBookAmount(bookId);
-                                        downloadReadBooks();
-                                    }
-                                })
-                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                            new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme)
+                                    .setTitle("Not finished book: " + bookList.get(pos).getName())
+                                    .setMessage("Are you sure to delete this book?")
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @SuppressLint("MissingPermission")
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            mDatabase.child("user_list").child(userId).child("reading").child(bookId).removeValue();
+                                            downloadReadBooks();
+                                        }
+                                    })
+                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
 
-                                    }
-                                })
-                                .show();
+                                        }
+                                    })
+                                    .show();
 
-                        deleteDialog.dismiss();
-                    }
-                });
+                            deleteDialog.dismiss();
+                        }
+                    });
 
-                finished.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                    finished.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
 
-                        new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme)
-                                .setTitle("Finished book: " + bookList.get(pos).getName())
-                                .setMessage("Are you sure?")
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @SuppressLint("MissingPermission")
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                            new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme)
+                                    .setTitle("Finished book: " + bookList.get(pos).getName())
+                                    .setMessage("Are you sure?")
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @SuppressLint("MissingPermission")
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent userReviewIntent = new Intent(getActivity(), UserReviewActivity.class);
+                                            Bundle bundle = new Bundle();
+                                            bundle.putSerializable("book", bookList.get(pos));
+                                            bundle.putSerializable("user", user);
+                                            bundle.putString("userId", userId);
+                                            userReviewIntent.putExtras(bundle);
+                                            getActivity().startActivity(userReviewIntent);
+                                        }
+                                    })
+                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
 
+                                        }
+                                    })
+                                    .show();
 
-                                        /*mDatabase.child("book_list").child(bookId).child("readed").child(userId).setValue(1);
-                                        mDatabase.child("book_list").child(bookId).child("reading").child(userId).removeValue();
-
-                                        mDatabase.child("user_list").child(userId).child("reading").child(bookId).removeValue();
-                                        mDatabase.child("user_list").child(userId).child("readed").child(bookId).setValue(1);
-
-                                        openRateDialog(bookList.get(pos), bookId);*/
-                                        Intent userReviewIntent = new Intent(getActivity(), UserReviewActivity.class);
-                                        Bundle bundle = new Bundle();
-                                        bundle.putSerializable("book", bookList.get(pos));
-                                        bundle.putString("userId", userId);
-                                        userReviewIntent.putExtras(bundle);
-                                        getActivity().startActivity(userReviewIntent);
-
-//                                        increaseBookAmount(bookId);
-//                                        downloadReadBooks();
-                                    }
-                                })
-                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                })
-                                .show();
-
-                        deleteDialog.dismiss();
-                    }
-                });
-                deleteDialog.setView(deleteDialogView);
-                deleteDialog.show();
-            }
-        });
+                            deleteDialog.dismiss();
+                        }
+                    });
+                    deleteDialog.setView(deleteDialogView);
+                    deleteDialog.show();
+                }
+            });
+        }
 
     }
 
     String bId;
     Book book2;
-
     public void openRateDialog(Book book, String bookId) {
         book2 = book;
         bId = bookId;
@@ -340,23 +336,4 @@ public class ReadingBookListFragment extends Fragment implements RatingDialogLis
 
     }
 
-    public void increaseBookAmount(final String bookId) {
-        mDatabase.child("book_list").child(bookId).child("bookCount").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-
-                    bCount = Long.parseLong(dataSnapshot.getValue().toString());
-                    bCount++;
-                    mDatabase.child("book_list").child(bookId).child("bookCount").setValue(bCount);
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
 }

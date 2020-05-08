@@ -33,7 +33,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyTV
             groupName = view.findViewById(R.id.groupName);
             personCount = view.findViewById(R.id.personCount);
             groupPoint = view.findViewById(R.id.groupPoint);
-//            groupPlace = view.findViewById(R.id.groupPlace);
             groupPhoto = view.findViewById(R.id.groupPhoto);
             gradientLayout = view.findViewById(R.id.gradientLayout);
 
@@ -80,6 +79,19 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyTV
 
         holder.gradientLayout.setBackground(context.getResources().getDrawable(gradientBack));
         holder.groupPhoto.setBackground(context.getResources().getDrawable(subjectImage));
+
+//        holder.setOnClick(new ItemClickListener() {
+//            @Override
+//            public void onItemClick(View v, int pos) {
+//
+//                Intent intent = new Intent(context, GroupUsersActivity.class);
+//                Bundle bundle = new Bundle();
+//                bundle.putSerializable("groupName", item.getGroup_name());
+//                bundle.putSerializable("groupId", item.getGroup_id());
+//                intent.putExtras(bundle);
+//                context.startActivity(intent);
+//            }
+//        });
 
     }
 

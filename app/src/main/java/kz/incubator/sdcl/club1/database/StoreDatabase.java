@@ -13,7 +13,7 @@ import kz.incubator.sdcl.club1.users_list_menu.module.User;
 public class StoreDatabase extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "reading_club.db";
-    private static final int DATABASE_VERSION = 23;
+    private static final int DATABASE_VERSION = 24;
 
     public static final String TABLE_USER = "user_store";
     public static final String TABLE_BOOKS = "book_store";
@@ -26,6 +26,7 @@ public class StoreDatabase extends SQLiteOpenHelper {
     public static final String COLUMN_GROUP = "ugroup";
     public static final String COLUMN_GROUP_ID = "ugroup_id";
     public static final String COLUMN_PHONE = "phone_number";
+    public static final String COLUMN_ENTER_DATE = "enter_date";
     public static final String COLUMN_POINT = "point";
     public static final String COLUMN_REVIEW_SUM = "review_sum";
     public static final String COLUMN_RAINTING_IN_GROUPS = "ratingInGroups";
@@ -62,6 +63,7 @@ public class StoreDatabase extends SQLiteOpenHelper {
                 COLUMN_GROUP + " TEXT, " +
                 COLUMN_GROUP_ID + " TEXT, " +
                 COLUMN_PHOTO + " TEXT, " +
+                COLUMN_ENTER_DATE + " TEXT, " +
                 COLUMN_BCOUNT + " INTEGER , " +
                 COLUMN_POINT + " INTEGER , " +
                 COLUMN_REVIEW_SUM + " INTEGER , " +
@@ -167,6 +169,7 @@ public class StoreDatabase extends SQLiteOpenHelper {
         updateValues.put(COLUMN_GROUP, user.getGroupName());
         updateValues.put(COLUMN_GROUP_ID, user.getGroup_id());
         updateValues.put(COLUMN_PHONE, user.getPhoneNumber());
+        updateValues.put(COLUMN_ENTER_DATE, user.getEnterDate());
         updateValues.put(COLUMN_POINT, user.getPoint());
         updateValues.put(COLUMN_REVIEW_SUM, user.getReview_sum());
         updateValues.put(COLUMN_RAINTING_IN_GROUPS, user.getRatingInGroups());

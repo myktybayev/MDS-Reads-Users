@@ -90,7 +90,7 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.MyTVie
 
         Book item = bookList.get(position);
 
-        Glide.with(context)
+        Glide.with(context.getApplicationContext())
                 .load(item.getPhoto())
                 .placeholder(R.drawable.item_book)
                 .into(holder.book_photo);

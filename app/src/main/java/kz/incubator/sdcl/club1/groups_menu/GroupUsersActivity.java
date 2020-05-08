@@ -56,6 +56,7 @@ import kz.incubator.sdcl.club1.users_list_menu.module.User;
 
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BCOUNT;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_EMAIL;
+import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_ENTER_DATE;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_GROUP;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_GROUP_ID;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_IMG_STORAGE_NAME;
@@ -158,7 +159,6 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
                 new RecyclerItemClickListener(this, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, final int pos) {
-
                         Intent intent = new Intent(GroupUsersActivity.this, UserProfileActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("user", userList.get(pos));
@@ -506,6 +506,7 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_GROUP_ID)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_GROUP)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_PHOTO)),
+                            userCursor.getString(userCursor.getColumnIndex(COLUMN_ENTER_DATE)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_IMG_STORAGE_NAME)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_BCOUNT)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_POINT)),

@@ -18,8 +18,15 @@ import com.dk.view.folder.ResideMenu;
 import com.dk.view.folder.ResideMenuItem;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import kz.incubator.sdcl.club1.about_us_menu.AboutUsFragment;
 import kz.incubator.sdcl.club1.authentications.LoginByPhoneActivity;
@@ -57,7 +64,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
         setUpMenu();
         setupViews(savedInstanceState);
-
+        initUserEnterDate();
     }
 
     public void setupViews(Bundle savedInstanceState) {
@@ -94,6 +101,39 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         actionToolbar.setTitle(title);
     }
 
+    String userId;
+    public void initUserEnterDate(){
+        if(!isAdmin()) {
+            if (currentUser.getPhoneNumber() != null && currentUser.getPhoneNumber().length() > 0) { // phone login
+                userId = currentUser.getPhoneNumber();
+            } else {
+                userId = currentUser.getDisplayName();
+            }
+
+            assert userId != null;
+            usersRef.child(userId).child("enterDate").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String eDate = dataSnapshot.getValue().toString();
+                    if(eDate.contains("not")){
+
+                        DateFormat dateF = new SimpleDateFormat("dd.MM.yyyy");
+                        String date = dateF.format(Calendar.getInstance().getTime());;
+
+                        usersRef.child(userId).child("enterDate").setValue(date);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    public void manageDate() {
+    }
 
     @Override
     public void onBackPressed() {

@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,18 +38,18 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import kz.incubator.sdcl.club1.R;
-import kz.incubator.sdcl.club1.users_list_menu.EditUser;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
 import kz.incubator.sdcl.club1.groups_menu.profile_fragments.ReadedBookListFragment;
 import kz.incubator.sdcl.club1.groups_menu.profile_fragments.ReadingBookListFragment;
 import kz.incubator.sdcl.club1.groups_menu.profile_fragments.RecommendationBookListFragment;
 import kz.incubator.sdcl.club1.groups_menu.profile_fragments.ReviewsForBookFragment;
+import kz.incubator.sdcl.club1.users_list_menu.EditUser;
 import kz.incubator.sdcl.club1.users_list_menu.module.User;
 
-public class MyCabinetActivity extends AppCompatActivity{
+public class MyCabinetActivity extends AppCompatActivity {
     Toolbar toolbar;
     AppBarLayout appBarLayout;
-    TextView username, ticketType, phoneNumber, userEmail, userRating;
+    TextView username, ticketType, phoneNumber, userEmail, userRating, userPoint;
     TextView readBookCount;
     CircleImageView userImage;
     ViewPager viewPager;
@@ -111,6 +113,7 @@ public class MyCabinetActivity extends AppCompatActivity{
         ticketType = findViewById(R.id.ticketType);
         readBookCount = findViewById(R.id.readBookCount);
         userImage = findViewById(R.id.userImage);
+        userPoint = findViewById(R.id.userPoint);
         viewPager = findViewById(R.id.viewPager);
 
         readingBookListFragment = new ReadingBookListFragment();
@@ -120,7 +123,8 @@ public class MyCabinetActivity extends AppCompatActivity{
 
         initUserId();
         initializeUser();
-        bookReadedCountListener();
+//        bookReadedCountListener();
+
         bundleFragment = new Bundle();
         bundleFragment.putString("class", "myCabinet");
         bundleFragment.putSerializable("user", user);
@@ -133,44 +137,36 @@ public class MyCabinetActivity extends AppCompatActivity{
 
         setupViewPager(viewPager);
         setupTabIcons();
+        addListener();
 
     }
 
     FirebaseUser currentUser;
     String userId = "";
-    public void initUserId(){
+
+    public void initUserId() {
         userId = "";
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (currentUser.getPhoneNumber() != null && currentUser.getPhoneNumber().length() > 0) { // phone login
             userId = currentUser.getPhoneNumber();
-        }else{
+        } else {
             userId = currentUser.getDisplayName();
         }
     }
 
     public void initializeUser() {
         Query myTopPostsQuery = mDatabase.child("user_list").child(userId);
-        myTopPostsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        myTopPostsQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 if (dataSnapshot.exists()) {
 
                     user = dataSnapshot.getValue(User.class);
+                    updateUserUI(user);
 
-                    Glide.with(MyCabinetActivity.this)
-                            .load(user.getPhoto())
-                            .placeholder(R.drawable.user_def)
-                            .into(userImage);
-
-                    username.setText(user.getInfo());
-                    userEmail.setText(user.getEmail());
-                    phoneNumber.setText(user.getPhoneNumber());
-                    ticketType.setText(user.getGroupName());
-                    readBookCount.setText("" + user.getBookCount());
-                    userRating.setText("" + user.getRatingInGroups());
                     progressLoading.setVisibility(View.GONE);
 
                 } else {
@@ -185,18 +181,49 @@ public class MyCabinetActivity extends AppCompatActivity{
         });
     }
 
-    int userReadBooksCount = 0;
-    int userReviewsCount = 0;
-    public void bookReadedCountListener() {
-        mDatabase.child("user_list").child(userId).child("readed").addValueEventListener(new ValueEventListener() {
+    public void updateUserUI(User user) {
+        Glide.with(getApplicationContext())
+                .load(user.getPhoto())
+                .crossFade()
+                .dontAnimate()
+                .placeholder(R.drawable.user_def)
+                .into(userImage);
+
+        username.setText(user.getInfo());
+        userEmail.setText(user.getEmail());
+        phoneNumber.setText(user.getPhoneNumber());
+        ticketType.setText(user.getGroupName());
+        readBookCount.setText("" + user.getBookCount());
+        userRating.setText("" + user.getRatingInGroups());
+        userPoint.setText("" + user.getPoint());
+    }
+
+    public void addListener() {
+        mDatabase.child("user_list").addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    userReadBooksCount = (int)dataSnapshot.getChildrenCount();
-                    readBookCount.setText("" + userReadBooksCount);
-                    mDatabase.child("user_list").child(userId).child("bookCount").setValue(dataSnapshot.getChildrenCount());
-                }
+            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+
             }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
+                User user = dataSnapshot.getValue(User.class);
+                updateUserUI(user);
+                storeDb.updateUser(sqdb, user);
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+
+            }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -205,6 +232,27 @@ public class MyCabinetActivity extends AppCompatActivity{
         });
     }
 
+//    int userReadBooksCount = 0;
+
+//    public void bookReadedCountListener() {
+//        mDatabase.child("user_list").child(userId).child("readed").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if(dataSnapshot.exists()){
+//                    userReadBooksCount = (int)dataSnapshot.getChildrenCount();
+//                    readBookCount.setText("" + userReadBooksCount);
+//                    mDatabase.child("user_list").child(userId).child("bookCount").setValue(dataSnapshot.getChildrenCount());
+////                    fragmentAdapter.notifyDataSetChanged();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
+
     private void setupTabIcons() {
         tabLayout.getTabAt(0).setIcon(tabIcons[0]);
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
@@ -212,16 +260,18 @@ public class MyCabinetActivity extends AppCompatActivity{
         tabLayout.getTabAt(3).setIcon(tabIcons[3]);
     }
 
-    private void setupViewPager(ViewPager viewPager) {
-        SimplePageFragmentAdapter adapter = new SimplePageFragmentAdapter(getSupportFragmentManager());
+    SimplePageFragmentAdapter fragmentAdapter;
 
-        adapter.addFragment(readingBookListFragment, "Reading");
-        adapter.addFragment(readedBookListFragment, "Readed");
-        adapter.addFragment(reviewsForBookFragment, "Reviews");
-        adapter.addFragment(recommendationBookListFragment, "Recommendations");
+    private void setupViewPager(ViewPager viewPager) {
+        fragmentAdapter = new SimplePageFragmentAdapter(getSupportFragmentManager());
+
+        fragmentAdapter.addFragment(readingBookListFragment, "Reading");
+        fragmentAdapter.addFragment(readedBookListFragment, "Readed");
+        fragmentAdapter.addFragment(reviewsForBookFragment, "Reviews");
+        fragmentAdapter.addFragment(recommendationBookListFragment, "Recommendations");
 
         viewPager.setOffscreenPageLimit(1);
-        viewPager.setAdapter(adapter);
+        viewPager.setAdapter(fragmentAdapter);
 
         tabLayout = findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
@@ -263,10 +313,13 @@ public class MyCabinetActivity extends AppCompatActivity{
                 Bundle bundle = data.getExtras();
                 User savedUser = (User) bundle.getSerializable("user");
 
-                Glide.with(MyCabinetActivity.this)
+                Glide.with(getApplicationContext())
                         .load(savedUser.getPhoto())
+                        .crossFade()
+                        .dontAnimate()
                         .placeholder(R.drawable.user_def)
                         .into(userImage);
+
 
                 username.setText(savedUser.getInfo());
 

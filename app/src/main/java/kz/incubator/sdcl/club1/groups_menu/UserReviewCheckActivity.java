@@ -1,6 +1,8 @@
 package kz.incubator.sdcl.club1.groups_menu;
 
+import android.app.ProgressDialog;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -70,6 +75,7 @@ public class UserReviewCheckActivity extends AppCompatActivity implements View.O
     @BindView(R.id.saveProgress)
     ProgressBar saveProgress;
 
+    ArrayList<User> userList;
     /*
     @BindString(R.string.title) String title;
     @BindDrawable(R.drawable.graphic)
@@ -109,6 +115,7 @@ public class UserReviewCheckActivity extends AppCompatActivity implements View.O
         mDatabase = FirebaseDatabase.getInstance().getReference();
         storeDb = new StoreDatabase(this);
         adminSaveBtn.setOnClickListener(this);
+        userList = new ArrayList<>();
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -208,25 +215,7 @@ public class UserReviewCheckActivity extends AppCompatActivity implements View.O
                     pointSum = user.getBookCount() * 10 + reviewSum;
                     mDatabase.child("user_list").child(userId).child("point").setValue(pointSum);
 
-                    final String gId = user.getGroup_id();
-                    groupPointSum =  0;
-                    mDatabase.child("user_list").orderByChild("group_id").equalTo(gId).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for(DataSnapshot usersData: dataSnapshot.getChildren()){
-                                User user = usersData.getValue(User.class);
-                                int point = user.getPoint();
-                                groupPointSum += point;
-                            }
-                            mDatabase.child("group_list").child(gId).child("sum_point").setValue(groupPointSum);
-                            finish();
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                    new ReCalcGroupPoints(UserReviewCheckActivity.this).execute();
 
                 }
             }
@@ -238,6 +227,64 @@ public class UserReviewCheckActivity extends AppCompatActivity implements View.O
         });
 
 
+    }
+
+    private class ReCalcGroupPoints extends AsyncTask<Void, Void, Void> {
+        private ProgressDialog dialog;
+
+        public ReCalcGroupPoints(UserReviewCheckActivity activity) {
+            dialog = new ProgressDialog(activity);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            dialog.setMessage(getString(R.string.re_calc_points));
+            dialog.show();
+        }
+        @Override
+        protected Void doInBackground(Void... args) {
+            mDatabase.child("user_list").orderByChild("group_id").equalTo(user.getGroup_id()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for(DataSnapshot usersData: dataSnapshot.getChildren()){
+                        User user = usersData.getValue(User.class);
+
+                        assert user != null;
+                        int point = user.getPoint();
+                        groupPointSum += point;
+                        userList.add(user);
+                    }
+                    mDatabase.child("group_list").child(user.getGroup_id()).child("sum_point").setValue(groupPointSum);
+                    updateUsersRating();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+            return null;
+        }
+
+        public void updateUsersRating(){
+            Collections.sort(userList, User.userPoint);
+            for(int i = 0; i < userList.size(); i++){
+                String uId = userList.get(i).getPhoneNumber();
+                mDatabase.child("user_list").child(uId).child("ratingInGroups").setValue(i+1);
+
+                Log.i(TAG, "userId: "+uId);
+                Log.i(TAG, "ratingInGroups: "+(i+1));
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+                finish();
+            }
+        }
     }
 
     @Override

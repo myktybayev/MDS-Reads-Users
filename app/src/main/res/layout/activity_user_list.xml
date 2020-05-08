@@ -77,7 +77,7 @@
                         android:id="@+id/rv"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        tools:listitem="@layout/item_groups2"
+                        tools:listitem="@layout/item_user2"
                         android:scrollbars="vertical" />
                 </RelativeLayout>
             </LinearLayout>

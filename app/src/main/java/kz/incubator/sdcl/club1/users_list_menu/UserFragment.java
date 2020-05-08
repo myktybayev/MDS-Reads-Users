@@ -60,6 +60,7 @@ import static kz.incubator.sdcl.club1.MenuActivity.isAdmin;
 import static kz.incubator.sdcl.club1.MenuActivity.setTitle;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BCOUNT;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_EMAIL;
+import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_ENTER_DATE;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_GROUP;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_GROUP_ID;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_IMG_STORAGE_NAME;
@@ -526,6 +527,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_GROUP_ID)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_GROUP)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_PHOTO)),
+                            userCursor.getString(userCursor.getColumnIndex(COLUMN_ENTER_DATE)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_IMG_STORAGE_NAME)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_BCOUNT)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_POINT)),

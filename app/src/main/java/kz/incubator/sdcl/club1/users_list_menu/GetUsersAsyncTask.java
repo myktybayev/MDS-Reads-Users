@@ -25,6 +25,7 @@ import kz.incubator.sdcl.club1.users_list_menu.module.User;
 import static kz.incubator.sdcl.club1.MenuActivity.setTitle;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BCOUNT;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_EMAIL;
+import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_ENTER_DATE;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_GROUP;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_GROUP_ID;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_IMG_STORAGE_NAME;
@@ -93,6 +94,7 @@ public class GetUsersAsyncTask extends AsyncTask<Void, User, Void> {
                         String group_id = user.getGroup_id();
 
                         String photo = user.getPhoto();
+                        String enter_date = user.getEnterDate();
                         String imgStorageName = user.getImgStorageName();
 
                         int bookCount = user.getBookCount();
@@ -107,6 +109,7 @@ public class GetUsersAsyncTask extends AsyncTask<Void, User, Void> {
                         teacherValue.put(COLUMN_GROUP, group);
                         teacherValue.put(COLUMN_GROUP_ID, group_id);
                         teacherValue.put(COLUMN_PHOTO, photo);
+                        teacherValue.put(COLUMN_ENTER_DATE, enter_date);
                         teacherValue.put(COLUMN_POINT, point);
                         teacherValue.put(COLUMN_REVIEW_SUM, review_sum);
                         teacherValue.put(COLUMN_RAINTING_IN_GROUPS, ratingInGroups);

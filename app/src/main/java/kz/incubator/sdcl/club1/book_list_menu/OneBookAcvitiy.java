@@ -165,7 +165,7 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
             int bPage_number = book.getPage_number();
             String bRating = book.getRating();
 
-            Glide.with(this)
+            Glide.with(getApplicationContext())
                     .load(book.getPhoto())
                     .placeholder(R.drawable.item_book)
                     .centerCrop()

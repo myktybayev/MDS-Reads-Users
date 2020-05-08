@@ -88,6 +88,8 @@ public class ReadedBookListFragment extends Fragment {
 
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("book", bookList.get(pos));
+                oneBookActivity.putExtras(bundle);
+                startActivity(oneBookActivity);
 
             }
         });

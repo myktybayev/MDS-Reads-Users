@@ -43,12 +43,17 @@ public class ReviewsForBookFragment extends Fragment {
     SQLiteDatabase sqdb;
     TextView checkIsEmpty;
     String userId;
+    FirebaseUser currentUser;
+    String TAG = "ReviewsForBookFragment";
+    User user;
+    String classType;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_comment_books, container, false);
-        initialize();
         initUserId();
+        initialize();
         getReviews();
         return view;
     }
@@ -66,39 +71,35 @@ public class ReviewsForBookFragment extends Fragment {
         storeDb = new StoreDatabase(getActivity());
         sqdb = storeDb.getWritableDatabase();
 
-        recyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getActivity(), recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, final int pos) {
+        if (!classType.equals("userProfile"))
+            recyclerView.addOnItemTouchListener(
+                    new RecyclerItemClickListener(getActivity(), recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, final int pos) {
 
-                        Intent intent = new Intent(getActivity(), UserReviewCheckActivity.class);
+                            Intent intent = new Intent(getActivity(), UserReviewCheckActivity.class);
 
-                        Bundle bundle = new Bundle();
-                        Log.i(TAG, "reviewList text: " + reviewList.get(pos).getBook_id());
+                            Bundle bundle = new Bundle();
+                            Log.i(TAG, "reviewList text: " + reviewList.get(pos).getBook_id());
 
-                        bundle.putSerializable("userReview", reviewList.get(pos));
-                        bundle.putSerializable("user", user);
-                        intent.putExtras(bundle);
+                            bundle.putSerializable("userReview", reviewList.get(pos));
+                            bundle.putSerializable("user", user);
+                            intent.putExtras(bundle);
 
-                        startActivityForResult(intent, 101);
+                            startActivityForResult(intent, 101);
 
-                    }
+                        }
 
-                    @Override
-                    public void onLongItemClick(View view, int position) {
+                        @Override
+                        public void onLongItemClick(View view, int position) {
 
-                    }
-                })
-        );
+                        }
+                    })
+            );
     }
-
-    FirebaseUser currentUser;
-    String TAG = "ReviewsForBookFragment";
-    User user;
 
     public void initUserId() {
         Bundle bundle = this.getArguments();
-        String classType;
         userId = "";
 
         if (bundle != null) {
@@ -129,7 +130,7 @@ public class ReviewsForBookFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 101) {
-            if(resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 String point = data.getStringExtra("point");
             }
             if (resultCode == Activity.RESULT_CANCELED) {
