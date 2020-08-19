@@ -49,13 +49,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import kz.incubator.sdcl.club1.R;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
 import kz.incubator.sdcl.club1.users_list_menu.EditUser;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 import kz.incubator.sdcl.club1.groups_menu.profile_fragments.ReadedBookListFragment;
 import kz.incubator.sdcl.club1.groups_menu.profile_fragments.ReadingBookListFragment;
 import kz.incubator.sdcl.club1.groups_menu.profile_fragments.RecommendationBookListFragment;
 import kz.incubator.sdcl.club1.groups_menu.profile_fragments.ReviewsForBookFragment;
-
-import static kz.incubator.sdcl.club1.MenuActivity.isAdmin;
 
 public class UserProfileActivity extends AppCompatActivity {
     Toolbar toolbar;
@@ -101,8 +99,6 @@ public class UserProfileActivity extends AppCompatActivity {
         user = (User) bundle.getSerializable("user");
 
         initWidgets();
-
-        if(isAdmin()) loadSubSpinner();
     }
 
     public void initWidgets() {
@@ -318,9 +314,6 @@ public class UserProfileActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        if (isAdmin()) {
-            inflater.inflate(R.menu.one_book_menu, menu);
-        }
         return true;
     }
 

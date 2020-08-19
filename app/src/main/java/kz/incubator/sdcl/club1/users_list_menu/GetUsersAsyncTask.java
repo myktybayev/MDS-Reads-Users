@@ -5,9 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
-import android.view.View;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -16,13 +14,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import kz.incubator.sdcl.club1.database.StoreDatabase;
 import kz.incubator.sdcl.club1.groups_menu.adapters.UserListAdapter;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
-import static kz.incubator.sdcl.club1.MenuActivity.setTitle;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BCOUNT;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_EMAIL;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_ENTER_DATE;
@@ -35,6 +31,7 @@ import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_PHOTO;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_POINT;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_RAINTING_IN_GROUPS;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_REVIEW_SUM;
+import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_USER_TYPE;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.TABLE_USER;
 
 public class GetUsersAsyncTask extends AsyncTask<Void, User, Void> {
@@ -42,18 +39,14 @@ public class GetUsersAsyncTask extends AsyncTask<Void, User, Void> {
     ArrayList<User> userList;
     StoreDatabase storeDb;
     SQLiteDatabase sqdb;
-    SwipeRefreshLayout swipeRefreshLayout;
     DatabaseReference mDatabaseRef, userRef;
     UserListAdapter listAdapter;
     Context context;
     String version;
-    View progressLoading;
 
-    public GetUsersAsyncTask(Context context, String version, SwipeRefreshLayout refreshLayout, View progressLoading) {
+    public GetUsersAsyncTask(Context context, String version) {
         this.context = context;
         this.version = version;
-        this.swipeRefreshLayout = refreshLayout;
-        this.progressLoading = progressLoading;
     }
 
     @Override
@@ -96,6 +89,7 @@ public class GetUsersAsyncTask extends AsyncTask<Void, User, Void> {
                         String photo = user.getPhoto();
                         String enter_date = user.getEnterDate();
                         String imgStorageName = user.getImgStorageName();
+                        String user_type = user.getUserType();
 
                         int bookCount = user.getBookCount();
                         int point = user.getPoint();
@@ -110,6 +104,7 @@ public class GetUsersAsyncTask extends AsyncTask<Void, User, Void> {
                         teacherValue.put(COLUMN_GROUP_ID, group_id);
                         teacherValue.put(COLUMN_PHOTO, photo);
                         teacherValue.put(COLUMN_ENTER_DATE, enter_date);
+                        teacherValue.put(COLUMN_USER_TYPE, user_type);
                         teacherValue.put(COLUMN_POINT, point);
                         teacherValue.put(COLUMN_REVIEW_SUM, review_sum);
                         teacherValue.put(COLUMN_RAINTING_IN_GROUPS, ratingInGroups);
@@ -119,11 +114,6 @@ public class GetUsersAsyncTask extends AsyncTask<Void, User, Void> {
                         sqdb.insert(TABLE_USER, null, teacherValue);
                     }
                 }
-                Collections.sort(userList, User.userPoint);
-                listAdapter = new UserListAdapter(context, userList);
-                progressLoading.setVisibility(View.GONE);
-
-                setTitle("Users " + userList.size());
             }
 
             @Override
@@ -139,12 +129,10 @@ public class GetUsersAsyncTask extends AsyncTask<Void, User, Void> {
     protected void onProgressUpdate(User... values) {
         super.onProgressUpdate(values);
         userList.add(values[0]);
-        listAdapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        swipeRefreshLayout.setRefreshing(false);
     }
 }

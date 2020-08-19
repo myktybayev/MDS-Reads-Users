@@ -21,7 +21,7 @@
 //
 //import kz.incubator.sdcl.club1.database.StoreDatabase;
 //import kz.incubator.sdcl.club1.groups_menu.adapters.UserListAdapter;
-//import kz.incubator.sdcl.club1.users_list_menu.module.User;
+//import kz.incubator.sdcl.club1.groups_menu.module.User;
 //
 //import static kz.incubator.sdcl.club1.MenuActivity.setTitle;
 //import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BCOUNT;

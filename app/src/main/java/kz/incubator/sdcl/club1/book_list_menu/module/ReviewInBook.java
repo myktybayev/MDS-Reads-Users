@@ -5,7 +5,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.Serializable;
 
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 @IgnoreExtraProperties
 public class ReviewInBook implements Serializable {

@@ -37,7 +37,7 @@
             android:name=".authentications.LoginByEmailPage"
             android:parentActivityName=".MenuActivity" />
         <activity
-            android:name=".user.MyCabinetActivity"
+            android:name=".my_cabinet.MyCabinetActivity"
             android:parentActivityName=".MenuActivity" />
         <activity
             android:name=".authentications.VerifyCodeSentActivity"
@@ -47,26 +47,15 @@
             android:name=".groups_menu.UserProfileActivity"
             android:parentActivityName=".groups_menu.GroupUsersActivity" />
 
-
         <activity
             android:name=".groups_menu.UserReviewCheckActivity"
             android:parentActivityName=".groups_menu.UserProfileActivity" />
 
         <activity
-            android:name=".authentications.AuthenPage"
-            android:parentActivityName=".MenuActivity" />
-
-        <activity
-            android:name=".user.UserReviewActivity"
+            android:name=".my_cabinet.UserReviewActivity"
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".groups_menu.UserProfileActivity" />
-
-        <activity
-            android:name=".users_list_menu.AddUser"
-            android:launchMode="singleInstance"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".groups_menu.GroupUsersActivity" />
 
         <activity
             android:name=".book_list_menu.ScannerActivity"

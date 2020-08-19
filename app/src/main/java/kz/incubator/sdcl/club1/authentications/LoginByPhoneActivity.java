@@ -4,15 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.nfc.Tag;
-import android.support.annotation.NonNull;
+import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -22,9 +19,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,7 +28,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import kz.incubator.sdcl.club1.MenuActivity;
 import kz.incubator.sdcl.club1.R;
-import kz.incubator.sdcl.club1.user.MyCabinetActivity;
 
 public class LoginByPhoneActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -47,37 +40,23 @@ public class LoginByPhoneActivity extends AppCompatActivity implements View.OnCl
     TextInputLayout inputLayoutEmail;
     String phoneNumberStr;
     DatabaseReference databaseReference;
-    String TAG = "LoginByPhoneActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_by_phone);
 
+        mAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+
+        if (mAuth.getCurrentUser() != null && !mAuth.getCurrentUser().getEmail().contains("admin")) {
+            Intent intent = new Intent(this, MenuActivity.class);
+            startActivity(intent);
+        }
+
         checkInternetConnection();
         initWidgets();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-
-        mAuth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        if (mAuth.getCurrentUser() != null) {
-
-            Intent intent = new Intent(LoginByPhoneActivity.this, MenuActivity.class);
-
-//            if (mAuth.getCurrentUser().getPhoneNumber() != null && mAuth.getCurrentUser().getPhoneNumber().length() > 0)// phone
-//            {
-//                intent.putExtra("userLoginType", "phone");
-//                Log.i(TAG, "userLoginType phone");
-//            }
-//
-//            else{
-//
-//                intent.putExtra("userLoginType", "email");
-//                Log.i(TAG, "userLoginType email");
-//            }
-
-            startActivity(intent);
-        }
 
         btnLogin.setOnClickListener(this);
         btnLoginByEmail.setOnClickListener(this);
@@ -92,9 +71,7 @@ public class LoginByPhoneActivity extends AppCompatActivity implements View.OnCl
                 progressVisible(true);
                 phoneNumberStr = phoneNumber.getText().toString();
 
-                if (phoneNumberStr.equals("001")) {
-                    logInAdmin();
-                } else if (checkInternetConnection()) {
+                if (checkInternetConnection()) {
 
                     databaseReference.child("user_list").child(phoneNumberStr).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -107,7 +84,7 @@ public class LoginByPhoneActivity extends AppCompatActivity implements View.OnCl
                                 startActivity(verifyActivity);
 
                             } else {
-                                Toast.makeText(LoginByPhoneActivity.this, "Қолданушы табылмады, Админге хабарласыңыз!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginByPhoneActivity.this, getString(R.string.user_not_found), Toast.LENGTH_SHORT).show();
                                 progressVisible(false);
                             }
                         }
@@ -127,7 +104,6 @@ public class LoginByPhoneActivity extends AppCompatActivity implements View.OnCl
 
                 break;
         }
-
     }
 
     public void progressVisible(boolean yes) {
@@ -142,27 +118,6 @@ public class LoginByPhoneActivity extends AppCompatActivity implements View.OnCl
             btnLogin.setVisibility(View.VISIBLE);
 
         }
-    }
-
-    public void logInAdmin() {
-        String email = "admin@reading.club";
-        String password = "123456";
-
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            startActivity(new Intent(LoginByPhoneActivity.this, MenuActivity.class));
-
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("LoginByPhoneActivity", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginByPhoneActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
     }
 
     public void initWidgets() {
@@ -204,7 +159,7 @@ public class LoginByPhoneActivity extends AppCompatActivity implements View.OnCl
             return true;
         }
 
-        Toast.makeText(this, "Check Inet connection", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.inetConnection), Toast.LENGTH_SHORT).show();
 
         progressBarLogin.setVisibility(View.GONE);
         btnLogin.setVisibility(View.VISIBLE);

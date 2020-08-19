@@ -1,4 +1,4 @@
-package kz.incubator.sdcl.club1.users_list_menu.module;
+package kz.incubator.sdcl.club1.groups_menu.module;
 
 
 import com.google.firebase.database.IgnoreExtraProperties;
@@ -16,16 +16,18 @@ public class  User implements Serializable {
     String groupName;
     String email;
     String enterDate;
+    String userType;
     int point;
     int review_sum;
     int bookCount;
     int ratingInGroups;
+    int typeRating;
 
     public User() {
 
     }
 
-    public User(String info, String email, String phoneNumber, String group_id, String groupName, String photo, String enterDate, String imgStorageName, int bookCount, int point, int review_sum, int ratingInGroups){
+    public User(String info, String email, String phoneNumber, String group_id, String groupName, String photo, String enterDate, String userType, String imgStorageName, int bookCount, int point, int review_sum, int ratingInGroups){
         this.info = info;
         this.group_id = group_id;
         this.groupName = groupName;
@@ -38,8 +40,25 @@ public class  User implements Serializable {
         this.review_sum = review_sum;
         this.ratingInGroups = ratingInGroups;
         this.enterDate = enterDate;
+        this.userType = userType;
     }
 
+    public User(int typeRating, String info, String email, String phoneNumber, String group_id, String groupName, String photo, String enterDate, String userType, String imgStorageName, int bookCount, int point, int review_sum, int ratingInGroups){
+        this.typeRating = typeRating;
+        this.info = info;
+        this.group_id = group_id;
+        this.groupName = groupName;
+        this.phoneNumber = phoneNumber;
+        this.photo = photo;
+        this.email = email;
+        this.imgStorageName = imgStorageName;
+        this.bookCount = bookCount;
+        this.point = point;
+        this.review_sum = review_sum;
+        this.ratingInGroups = ratingInGroups;
+        this.enterDate = enterDate;
+        this.userType = userType;
+    }
     public static Comparator<User> userNameComprator = new Comparator<User>() {
 
         public int compare(User u1, User u2) {
@@ -85,6 +104,22 @@ public class  User implements Serializable {
             //return StudentName2.compareTo(StudentName1);
         }
     };
+
+    public int getTypeRating() {
+        return typeRating;
+    }
+
+    public void setTypeRating(int typeRating) {
+        this.typeRating = typeRating;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
 
     public String getEnterDate() {
         return enterDate;

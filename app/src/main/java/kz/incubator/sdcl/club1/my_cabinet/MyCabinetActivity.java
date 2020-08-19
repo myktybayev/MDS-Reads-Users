@@ -1,4 +1,4 @@
-package kz.incubator.sdcl.club1.user;
+package kz.incubator.sdcl.club1.my_cabinet;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,11 +12,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +44,7 @@ import kz.incubator.sdcl.club1.groups_menu.profile_fragments.ReadingBookListFrag
 import kz.incubator.sdcl.club1.groups_menu.profile_fragments.RecommendationBookListFragment;
 import kz.incubator.sdcl.club1.groups_menu.profile_fragments.ReviewsForBookFragment;
 import kz.incubator.sdcl.club1.users_list_menu.EditUser;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 public class MyCabinetActivity extends AppCompatActivity {
     Toolbar toolbar;
@@ -52,6 +52,7 @@ public class MyCabinetActivity extends AppCompatActivity {
     TextView username, ticketType, phoneNumber, userEmail, userRating, userPoint;
     TextView readBookCount;
     CircleImageView userImage;
+    ImageView userTypeIcon;
     ViewPager viewPager;
     TabLayout tabLayout;
     int USER_EDIT = 97;
@@ -89,7 +90,7 @@ public class MyCabinetActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("My Cabinet");
+        toolbar.setTitle(getString(R.string.menu_my_cabinet));
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -114,6 +115,7 @@ public class MyCabinetActivity extends AppCompatActivity {
         readBookCount = findViewById(R.id.readBookCount);
         userImage = findViewById(R.id.userImage);
         userPoint = findViewById(R.id.userPoint);
+        userTypeIcon = findViewById(R.id.userTypeIcon);
         viewPager = findViewById(R.id.viewPager);
 
         readingBookListFragment = new ReadingBookListFragment();
@@ -125,18 +127,6 @@ public class MyCabinetActivity extends AppCompatActivity {
         initializeUser();
 //        bookReadedCountListener();
 
-        bundleFragment = new Bundle();
-        bundleFragment.putString("class", "myCabinet");
-        bundleFragment.putSerializable("user", user);
-
-
-        readingBookListFragment.setArguments(bundleFragment);
-        readedBookListFragment.setArguments(bundleFragment);
-        reviewsForBookFragment.setArguments(bundleFragment);
-        recommendationBookListFragment.setArguments(bundleFragment);
-
-        setupViewPager(viewPager);
-        setupTabIcons();
         addListener();
 
     }
@@ -170,7 +160,7 @@ public class MyCabinetActivity extends AppCompatActivity {
                     progressLoading.setVisibility(View.GONE);
 
                 } else {
-                    Toast.makeText(MyCabinetActivity.this, "Can not find user info", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MyCabinetActivity.this, getString(R.string.can_not_find_user), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -196,6 +186,35 @@ public class MyCabinetActivity extends AppCompatActivity {
         readBookCount.setText("" + user.getBookCount());
         userRating.setText("" + user.getRatingInGroups());
         userPoint.setText("" + user.getPoint());
+
+        int uTypeIcon = R.color.transparent;
+
+        switch (user.getUserType()) {
+            case "gold":
+                uTypeIcon = R.drawable.ic_gold;
+                break;
+            case "silver":
+                uTypeIcon = R.drawable.ic_silver;
+                break;
+            case "bronze":
+                uTypeIcon = R.drawable.ic_bronze;
+                break;
+        }
+
+        userTypeIcon.setImageResource(uTypeIcon);
+
+        if (readingBookListFragment.getArguments() == null) {
+
+            bundleFragment = new Bundle();
+            bundleFragment.putSerializable("user", user);
+
+            readingBookListFragment.setArguments(bundleFragment);
+            readedBookListFragment.setArguments(bundleFragment);
+            reviewsForBookFragment.setArguments(bundleFragment);
+            recommendationBookListFragment.setArguments(bundleFragment);
+
+            setupViewPager(viewPager);
+        }
     }
 
     public void addListener() {
@@ -234,7 +253,7 @@ public class MyCabinetActivity extends AppCompatActivity {
 
 //    int userReadBooksCount = 0;
 
-//    public void bookReadedCountListener() {
+    //    public void bookReadedCountListener() {
 //        mDatabase.child("user_list").child(userId).child("readed").addValueEventListener(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(DataSnapshot dataSnapshot) {
@@ -252,29 +271,26 @@ public class MyCabinetActivity extends AppCompatActivity {
 //            }
 //        });
 //    }
-
-    private void setupTabIcons() {
-        tabLayout.getTabAt(0).setIcon(tabIcons[0]);
-        tabLayout.getTabAt(1).setIcon(tabIcons[1]);
-        tabLayout.getTabAt(2).setIcon(tabIcons[2]);
-        tabLayout.getTabAt(3).setIcon(tabIcons[3]);
-    }
-
     SimplePageFragmentAdapter fragmentAdapter;
 
     private void setupViewPager(ViewPager viewPager) {
         fragmentAdapter = new SimplePageFragmentAdapter(getSupportFragmentManager());
 
-        fragmentAdapter.addFragment(readingBookListFragment, "Reading");
-        fragmentAdapter.addFragment(readedBookListFragment, "Readed");
-        fragmentAdapter.addFragment(reviewsForBookFragment, "Reviews");
-        fragmentAdapter.addFragment(recommendationBookListFragment, "Recommendations");
+        fragmentAdapter.addFragment(readingBookListFragment, getString(R.string.reading));
+        fragmentAdapter.addFragment(readedBookListFragment, getString(R.string.readed));
+        fragmentAdapter.addFragment(reviewsForBookFragment, getString(R.string.reviews));
+        fragmentAdapter.addFragment(recommendationBookListFragment, getString(R.string.recommendations));
 
         viewPager.setOffscreenPageLimit(1);
         viewPager.setAdapter(fragmentAdapter);
 
         tabLayout = findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
+
+        tabLayout.getTabAt(0).setIcon(tabIcons[0]);
+        tabLayout.getTabAt(1).setIcon(tabIcons[1]);
+        tabLayout.getTabAt(2).setIcon(tabIcons[2]);
+        tabLayout.getTabAt(3).setIcon(tabIcons[3]);
     }
 
     @Override

@@ -29,9 +29,9 @@ import java.util.Calendar;
 import java.util.List;
 
 import kz.incubator.sdcl.club1.R;
-import kz.incubator.sdcl.club1.groups_menu.UserProfileActivity;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.UserProfileActivity;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 public class AlreadyReadFragment extends Fragment {
 
@@ -40,7 +40,7 @@ public class AlreadyReadFragment extends Fragment {
     private List<User> userList;
     View view;
     DatabaseReference mDatabaseRef, userRef;
-    String bookId;
+    String userId, bookId, userGroupId;
     StoreDatabase storeDb;
     SQLiteDatabase sqdb;
     ProgressBar progressBar;
@@ -57,7 +57,8 @@ public class AlreadyReadFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerForBook);
         userList = new ArrayList<>();
 
-        if(getArguments() != null){
+        if (getArguments() != null) {
+            userId = getArguments().getString("userId");
             bookId = getArguments().getString("bookId");
         }
 
@@ -69,37 +70,52 @@ public class AlreadyReadFragment extends Fragment {
 
         userRef = FirebaseDatabase.getInstance().getReference().child("user_list");
         mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("book_list").child(bookId).child("readed");
-        mDatabaseRef.addValueEventListener(new ValueEventListener() {
+
+        userRef.child(userId).child("group_id").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    userList.clear();
-                    checkIsEmpty.setVisibility(View.GONE);
+                userGroupId = dataSnapshot.getValue().toString();
 
+                mDatabaseRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            userList.clear();
+                            checkIsEmpty.setVisibility(View.GONE);
 
-                    for (DataSnapshot users : dataSnapshot.getChildren()) {
-                        String userId = users.getKey();
+                            for (DataSnapshot users : dataSnapshot.getChildren()) {
+                                String userId = users.getKey();
 
-                        userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                userList.add(dataSnapshot.getValue(User.class));
+                                userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        User user = dataSnapshot.getValue(User.class);
 
-                                readedListAdapter.notifyDataSetChanged();
+                                        if (user.getGroup_id().equals(userGroupId))
+                                            userList.add(dataSnapshot.getValue(User.class));
+
+                                        readedListAdapter.notifyDataSetChanged();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
                             }
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                        } else {
+                            checkIsEmpty.setVisibility(View.VISIBLE);
+                        }
 
-                            }
-                        });
+                        progressBar.setVisibility(View.GONE);
                     }
 
-                } else {
-                    checkIsEmpty.setVisibility(View.VISIBLE);
-                }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                progressBar.setVisibility(View.GONE);
+                    }
+                });
             }
 
             @Override
@@ -107,6 +123,8 @@ public class AlreadyReadFragment extends Fragment {
 
             }
         });
+
+
 
         readedListAdapter = new ReadedListAdapter(getActivity(), userList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -152,6 +170,7 @@ public class AlreadyReadFragment extends Fragment {
             Glide.with(context)
                     .load(item.getPhoto())
                     .placeholder(R.drawable.user_def)
+                    .dontAnimate()
                     .into(holder.person_photo);
 
             holder.info.setText(item.getInfo());
@@ -163,7 +182,7 @@ public class AlreadyReadFragment extends Fragment {
                 public void onClick(View v) {
                     Intent intent = new Intent(getContext(), UserProfileActivity.class);
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable("user",item);
+                    bundle.putSerializable("user", item);
                     intent.putExtras(bundle);
                     getContext().startActivity(intent);
                 }
@@ -176,6 +195,7 @@ public class AlreadyReadFragment extends Fragment {
         }
 
     }
+
     public String checkAbone(String ticketDay) {
         String abone = "norm";
 

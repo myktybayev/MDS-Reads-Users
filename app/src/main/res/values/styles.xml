@@ -88,7 +88,6 @@
         <item name="colorControlNormal">#fff</item>
         <item name="colorControlHighlight">@color/white</item>
         <item name="android:fontFamily">@font/qbold</item>
-
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light" />

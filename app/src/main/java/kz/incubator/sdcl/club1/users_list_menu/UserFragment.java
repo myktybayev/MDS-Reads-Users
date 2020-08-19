@@ -3,7 +3,6 @@ package kz.incubator.sdcl.club1.users_list_menu;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
@@ -52,11 +51,10 @@ import java.util.Collections;
 
 import kz.incubator.sdcl.club1.R;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
-import kz.incubator.sdcl.club1.groups_menu.module.Groups;
 import kz.incubator.sdcl.club1.groups_menu.adapters.UserListAdapter;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.Groups;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
-import static kz.incubator.sdcl.club1.MenuActivity.isAdmin;
 import static kz.incubator.sdcl.club1.MenuActivity.setTitle;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BCOUNT;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_EMAIL;
@@ -70,6 +68,7 @@ import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_PHOTO;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_POINT;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_RAINTING_IN_GROUPS;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_REVIEW_SUM;
+import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_USER_TYPE;
 
 public class UserFragment extends Fragment implements View.OnClickListener {
     DatabaseReference mDatabaseRef, userRef;
@@ -135,15 +134,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
 
 
         fabBtn = view.findViewById(R.id.fabBtn);
-        if (!isAdmin()) {
-            fabBtn.setVisibility(View.GONE);
-        }
-        fabBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getActivity(), AddUser.class));
-            }
-        });
+        fabBtn.setVisibility(View.GONE);
 
         searchView = view.findViewById(R.id.searchView);
         userListCopy = new ArrayList<>();
@@ -176,8 +167,8 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                     String gId = groupIdsList.get(pos);
 
                     for (User item : userListCopy) {
-                        Log.i(TAG, "group name: "+item.getGroupName());
-                        if (item.getGroupName()!= null && item.getGroupName().equals(gId)) {
+                        Log.i(TAG, "group name: " + item.getGroupName());
+                        if (item.getGroupName() != null && item.getGroupName().equals(gId)) {
                             userList.add(item);
                         }
 //
@@ -237,18 +228,19 @@ public class UserFragment extends Fragment implements View.OnClickListener {
 
     }
 
-    public void getGroupsFromFirebase(){
+    public void getGroupsFromFirebase() {
         mDatabaseRef.child("group_list").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    for(DataSnapshot group: dataSnapshot.getChildren()){
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot group : dataSnapshot.getChildren()) {
                         Groups itemGroup = group.getValue(Groups.class);
                         groupIdsList.add(itemGroup.getGroup_name());
                     }
                     spinnerAdapter.notifyDataSetChanged();
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -346,10 +338,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
 
-        if (isAdmin()) {
-            inflater.inflate(R.menu.menu_card_read, menu);
-        } else
-            inflater.inflate(R.menu.profile_menu, menu);
+        inflater.inflate(R.menu.menu_card_read, menu);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -528,6 +517,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_GROUP)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_PHOTO)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_ENTER_DATE)),
+                            userCursor.getString(userCursor.getColumnIndex(COLUMN_USER_TYPE)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_IMG_STORAGE_NAME)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_BCOUNT)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_POINT)),
@@ -544,7 +534,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
 
             return null;
         }
-        
+
         @Override
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);

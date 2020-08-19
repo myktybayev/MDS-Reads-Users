@@ -1,11 +1,8 @@
 package kz.incubator.sdcl.club1.book_list_menu;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
@@ -16,11 +13,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -29,8 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -95,16 +85,17 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
     }
 
     FirebaseUser currentUser;
-    public void initUserId(){
+
+    public void initUserId() {
         userId = "";
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (currentUser.getPhoneNumber() != null && currentUser.getPhoneNumber().length() > 0) { // phone login
             userId = currentUser.getPhoneNumber();
-        }else{
+        } else {
             userId = currentUser.getDisplayName();
-            currentUserEmail = currentUser.getEmail();
+//            currentUserEmail = currentUser.getEmail();
         }
     }
 
@@ -141,21 +132,12 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
         userRef = FirebaseDatabase.getInstance().getReference();
         storageReference = FirebaseStorage.getInstance().getReference();
         bookDescFragment = new BookDescFragment();
-
-        if(!isAdmin()){
-            readBookBtn.setOnClickListener(this);
-        }else{
-            readBookBtn.setVisibility(View.GONE);
-        }
+        readBookBtn.setOnClickListener(this);
     }
-
 
     public static String bName, bDesc = "", bId, bAuthor;
 
     public void initializeBundle(Bundle bundle, Book book) {
-
-        Log.i("book", "name: " + book.getName());
-
         if (bundle != null && book != null) {
             bId = book.getFirebaseKey();
             bName = book.getName();
@@ -173,13 +155,14 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
 
             bookName.setText(bName);
             bookAuthor.setText(bAuthor);
-            page_number.setText("Page: " + bPage_number);
+            page_number.setText(getString(R.string.page) + bPage_number);
 
             int ratingInt = Integer.parseInt(bRating.split(",")[0]);
             bookRating.setRating(ratingInt);
 
 
             Bundle args = new Bundle();
+            args.putString("userId", userId);
             args.putString("bookId", bId);
 
             userReadingFragment = new UserReadingFragment();
@@ -205,14 +188,14 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
                 mDatabase.child("user_list").child(userId).child("reading").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists()){
+                        if (dataSnapshot.exists()) {
 
-                            Toast.makeText(OneBookAcvitiy.this, "Сізде бітірілмеген кітап бар, жаңа кітап алу үшін соны бітіруіңіз керек!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(OneBookAcvitiy.this, getString(R.string.not_finished_book), Toast.LENGTH_LONG).show();
 
-                        }else{
+                        } else {
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(OneBookAcvitiy.this);
-                            builder.setTitle("Are you sure to read this book?");
+                            builder.setTitle(getString(R.string.sure_read_book));
 
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                                 builder.setMessage(Html.fromHtml(bAuthor + "- <b>" + bName + "</b>", Html.FROM_HTML_MODE_LEGACY));
@@ -221,7 +204,7 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
                             }
 
                             builder.setCancelable(false)
-                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
 
 
@@ -229,15 +212,16 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
 
                                             mDatabase.child("user_list").child(userId).child("reading").child(bID).setValue(1);
                                             mDatabase.child("book_list").child(bID).child("reading").child(userId).setValue(1);
-                                            Toast.makeText(OneBookAcvitiy.this, "Book added to your profile", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(OneBookAcvitiy.this, getString(R.string.book_added_to_profile), Toast.LENGTH_SHORT).show();
 
                                         }
                                     })
-                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             dialog.cancel();
                                         }
                                     });
+
                             AlertDialog alert = builder.create();
                             alert.show();
                         }
@@ -254,158 +238,7 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        if (isAdmin()) {
-            inflater.inflate(R.menu.one_book_menu, menu);
-        } else {
-//            inflater.inflate(R.menu.user_review_menu, menu);
-        }
-        return true;
-    }
-
     int BOOK_EDIT = 98;
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (!isAdmin()) { // users
-
-
-        } else { // admin
-            switch (id) {
-                case R.id.edit_book:
-
-                    Intent intent = new Intent(this, EditBook.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("book", book);
-                    intent.putExtras(bundle);
-                    startActivityForResult(intent, BOOK_EDIT);
-
-                    break;
-
-                case R.id.delete_book:
-
-                    LayoutInflater factory = LayoutInflater.from(this);
-
-                    final View deleteDialogView = factory.inflate(R.layout.dialog_delete_book, null);
-                    final AlertDialog addDialog = new AlertDialog.Builder(this).create();
-
-                    Button yesBtn = deleteDialogView.findViewById(R.id.yesBtn);
-                    Button noBtn = deleteDialogView.findViewById(R.id.noBtn);
-
-                    TextView bName = deleteDialogView.findViewById(R.id.bName);
-                    TextView bAuthor = deleteDialogView.findViewById(R.id.bAuthor);
-
-                    bName.setText(book.getName());
-                    bAuthor.setText(book.getAuthor());
-
-                    yesBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                            mDatabase.child("book_list").child(book.getFirebaseKey()).removeValue();
-
-                            mDatabase.child("user_list").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    for (DataSnapshot users : dataSnapshot.getChildren()) {
-                                        mDatabase.child("user_list").child(users.getKey()).child("reading").child(book.getFirebaseKey()).removeValue();
-                                        mDatabase.child("user_list").child(users.getKey()).child("readed").child(book.getFirebaseKey()).removeValue();
-                                    }
-
-                                    increaseBookVersion();
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-
-                            StorageReference desertRef = storageReference.child("book_images").child(book.getImgStorageName());
-                            desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Toast.makeText(OneBookAcvitiy.this, "Book deleted", Toast.LENGTH_SHORT).show();
-                                    onBackPressed();
-                                    finish();
-                                }
-
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    Log.d("info", "onFailure: did not delete file");
-                                }
-                            });
-
-                        }
-                    });
-
-                    noBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            addDialog.dismiss();
-                        }
-                    });
-
-                    addDialog.setView(deleteDialogView);
-                    addDialog.show();
-
-                    break;
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public boolean isAdmin() {
-
-        if (currentUserEmail != null && currentUserEmail.contains("admin")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public void increaseBookVersion() {
-        mDatabase.child("book_list_ver").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String version;
-
-                if (dataSnapshot.exists()) {
-                    version = dataSnapshot.getValue().toString();
-                    long ver = Long.parseLong(version);
-                    ver += 1;
-                    mDatabase.child("book_list_ver").setValue(ver);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == BOOK_EDIT) {
-            if (resultCode == Activity.RESULT_OK) {
-
-                Bundle bundle = data.getExtras();
-                book = (Book) bundle.getSerializable("edited_book");
-                initializeBundle(bundle, book);
-                bookDescFragment.setDesc(book.getDesc());
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
-            }
-        }
-    }
 
     private void setupTabIcons() {
         tabLayout.getTabAt(0).setIcon(tabIcons[0]);
@@ -416,10 +249,10 @@ public class OneBookAcvitiy extends AppCompatActivity implements View.OnClickLis
 
     private void setupViewPager(ViewPager viewPager) {
         SimplePageFragmentAdapter adapter = new SimplePageFragmentAdapter(getSupportFragmentManager());
-        adapter.addFragment(bookDescFragment, "Description");
-        adapter.addFragment(userReadingFragment, "Reading user");
-        adapter.addFragment(alreadyReadFragment, "Already read");
-        adapter.addFragment(userReviewsFragment, "Reviews");
+        adapter.addFragment(bookDescFragment, getString(R.string.bookDescFragment));
+        adapter.addFragment(userReadingFragment, getString(R.string.userReadingFragment));
+        adapter.addFragment(alreadyReadFragment, getString(R.string.alreadyReadFragment));
+        adapter.addFragment(userReviewsFragment, getString(R.string.userReviewsFragment));
 
         viewPager.setAdapter(adapter);
     }

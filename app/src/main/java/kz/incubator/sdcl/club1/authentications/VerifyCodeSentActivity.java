@@ -95,7 +95,7 @@ public class VerifyCodeSentActivity extends AppCompatActivity implements View.On
             Toast.makeText(VerifyCodeSentActivity.this, "onVerificationFailed" + e, Toast.LENGTH_SHORT).show();
 
             if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                Toast.makeText(VerifyCodeSentActivity.this, "Неправильный номер телефона", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VerifyCodeSentActivity.this, getString(R.string.incorrect_phone_number), Toast.LENGTH_SHORT).show();
 
             } else if (e instanceof FirebaseTooManyRequestsException) {
 
@@ -113,9 +113,6 @@ public class VerifyCodeSentActivity extends AppCompatActivity implements View.On
 
 
             mVerificationId = verificationId;
-//                mResendToken = token;
-
-            // ...
         }
     };
 
@@ -147,7 +144,7 @@ public class VerifyCodeSentActivity extends AppCompatActivity implements View.On
                             btnVerifyProgress.setVisibility(View.GONE);
                             btnVerify.setVisibility(View.VISIBLE);
 
-                            Toast.makeText(VerifyCodeSentActivity.this, "PIN-код неверен, проверьте и повторите ещё раз", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(VerifyCodeSentActivity.this, getString(R.string.incorrect_pin_number), Toast.LENGTH_SHORT).show();
 
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {

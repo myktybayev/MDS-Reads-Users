@@ -36,18 +36,4 @@
             android:layout_height="wrap_content"
             android:scrollbars="vertical" />
     </android.support.v4.widget.SwipeRefreshLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="50dp"
-        android:layout_marginRight="10dp"
-        android:clickable="true"
-        android:foreground="?android:selectableItemBackground"
-        android:src="@drawable/ic_add_black_24dp" />
-
 </RelativeLayout>

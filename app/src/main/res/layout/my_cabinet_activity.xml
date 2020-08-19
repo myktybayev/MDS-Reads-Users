@@ -49,14 +49,32 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center">
 
-                        <de.hdodenhof.circleimageview.CircleImageView
-                            android:id="@+id/userImage"
+
+                        <RelativeLayout
+                            android:id="@+id/userLayout"
                             android:layout_width="120dp"
-                            android:layout_height="120dp"
                             android:layout_centerInParent="true"
-                            android:src="@drawable/user_def"
-                            app:civ_border_color="@color/colorGray"
-                            app:civ_border_width="5dp" />
+                            android:layout_height="wrap_content">
+
+
+                            <de.hdodenhof.circleimageview.CircleImageView
+                                android:id="@+id/userImage"
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:layout_centerInParent="true"
+                                android:src="@drawable/user_def"
+                                app:civ_border_color="@color/colorGray"
+                                app:civ_border_width="5dp" />
+
+                            <ImageView
+                                android:id="@+id/userTypeIcon"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentRight="true"/>
+
+                        </RelativeLayout>
+
 
                         <ImageView
                             android:id="@+id/image"
@@ -66,8 +84,8 @@
                             android:layout_centerInParent="true"
                             android:layout_marginLeft="20dp"
                             android:layout_marginStart="20dp"
-                            android:layout_toRightOf="@id/userImage"
-                            android:layout_toEndOf="@id/userImage"
+                            android:layout_toRightOf="@id/userLayout"
+                            android:layout_toEndOf="@id/userLayout"
                             android:src="@drawable/ic_star_white" />
 
                         <TextView

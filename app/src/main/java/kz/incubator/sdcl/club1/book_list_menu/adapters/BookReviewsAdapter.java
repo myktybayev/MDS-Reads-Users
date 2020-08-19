@@ -26,8 +26,8 @@ public class BookReviewsAdapter extends RecyclerView.Adapter<BookReviewsAdapter.
 
     public class MyTViewHolder extends RecyclerView.ViewHolder{
         public TextView info;
-        TextView review_text;
-        RatingBar bookRating, adminRate;
+        TextView review_text, adminRate;
+        RatingBar bookRating;
         ImageView notebook;
 
         public MyTViewHolder(View view) {
@@ -75,7 +75,19 @@ public class BookReviewsAdapter extends RecyclerView.Adapter<BookReviewsAdapter.
         holder.info.setText(bookName);
         holder.review_text.setText("\""+item.getReview_text()+"\"");
         holder.bookRating.setRating(bookRating);
-        holder.adminRate.setRating(adminRating);
+
+        if(adminRating==0){
+            holder.adminRate.setTextColor(context.getResources().getColor(R.color.orange));
+
+        }else if(adminRating < 0){
+
+            holder.adminRate.setTextColor(context.getResources().getColor(R.color.red));
+            holder.adminRate.setText("" + adminRating);
+
+        }else{
+            holder.adminRate.setTextColor(context.getResources().getColor(R.color.green_dark));
+            holder.adminRate.setText("" + adminRating);
+        }
 
     }
 

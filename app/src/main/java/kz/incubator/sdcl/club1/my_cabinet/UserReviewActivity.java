@@ -1,11 +1,14 @@
-package kz.incubator.sdcl.club1.user;
+package kz.incubator.sdcl.club1.my_cabinet;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,7 +34,7 @@ import kz.incubator.sdcl.club1.R;
 import kz.incubator.sdcl.club1.book_list_menu.module.Book;
 import kz.incubator.sdcl.club1.book_list_menu.module.ReviewInBook;
 import kz.incubator.sdcl.club1.book_list_menu.module.ReviewInUser;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 public class UserReviewActivity extends AppCompatActivity {
 
@@ -47,7 +50,7 @@ public class UserReviewActivity extends AppCompatActivity {
     String userId;
     ArrayList<User> userList;
     User user;
-
+    TextView review_word_count, review_bonus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +62,10 @@ public class UserReviewActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("SetTextI18n")
     public void initWidgets() {
         toolbar = findViewById(R.id.toolbars);
         appBarLayout = findViewById(R.id.app_bar);
-
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getString(R.string.write_a_review));
@@ -80,9 +83,36 @@ public class UserReviewActivity extends AppCompatActivity {
         bookAuthor = findViewById(R.id.bookAuthor);
         bookRating = findViewById(R.id.bookRating);
         bookImage = findViewById(R.id.bookImage);
+        review_word_count = findViewById(R.id.review_word_count);
+        review_bonus = findViewById(R.id.review_bonus);
 
         bookNewRating = findViewById(R.id.bookNewRating);
         userReviewEditText = findViewById(R.id.userReviewEditText);
+
+        review_word_count.setText(getString(R.string.review_words_count) + " 0");
+
+        userReviewEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String input = userReviewEditText.getText().toString().trim();
+                String[] wordCount = input.split("\\s");
+                review_word_count.setText(getString(R.string.review_words_count) + " " + wordCount.length);
+                if (wordCount.length >= 50) {
+                    review_bonus.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     public void initializeBook() {
@@ -93,7 +123,6 @@ public class UserReviewActivity extends AppCompatActivity {
             user = (User) bundle.getSerializable("user");
             userId = bundle.getString("userId");
 
-            Log.i("review_sum", "UserReviewActivity: " + user.getReview_sum());
             Glide.with(getApplicationContext())
                     .load(book.getPhoto())
                     .dontAnimate()
@@ -130,7 +159,12 @@ public class UserReviewActivity extends AppCompatActivity {
 
                 if (newRating > 0 && reviewText.length() > 0) {
 
-                    addRateAndReview(newRating, reviewText);
+                    if (reviewText.length() >= 50) {
+                        addRateAndReview(newRating, reviewText);
+
+                    } else {
+                        Toast.makeText(this, getString(R.string.er_review_count), Toast.LENGTH_LONG).show();
+                    }
 
                 } else {
                     Toast.makeText(this, getString(R.string.rating_error), Toast.LENGTH_SHORT).show();
@@ -140,10 +174,11 @@ public class UserReviewActivity extends AppCompatActivity {
 
         }
 
-
         return super.onOptionsItemSelected(item);
     }
+
     String bId;
+
     public void addRateAndReview(float rate, String comment) {
 
         String ratingSplit[] = book.getRating().split(",");
@@ -173,7 +208,6 @@ public class UserReviewActivity extends AppCompatActivity {
         mDatabase.child("user_list").child(userId).child("reviews").child(fKey).setValue(review2);
 
 
-        Toast.makeText(this, book.getName() + getString(R.string.rated_successfully), Toast.LENGTH_SHORT).show();
         mDatabase.child("user_list").child(userId).child("readed").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -181,10 +215,39 @@ public class UserReviewActivity extends AppCompatActivity {
                     long userBookCount = dataSnapshot.getChildrenCount();
                     mDatabase.child("user_list").child(userId).child("bookCount").setValue(userBookCount);
 
-                    int reviewSum = user.getReview_sum();
+                    int reviewSum = user.getReview_sum() + 10;
+                    mDatabase.child("user_list").child(userId).child("review_sum").setValue(reviewSum);
                     long pointSum = userBookCount * 10 + reviewSum;
 
                     mDatabase.child("user_list").child(userId).child("point").setValue(pointSum);
+
+                    String userRatingCategory = "other";
+
+                    if (userBookCount >= 5) {
+
+                        String userType = "bronze";
+                        userRatingCategory = "c_bronze";
+
+                        if (userBookCount >= 50) {
+                            userType = "gold";
+                            userRatingCategory = "a_gold";
+                            mDatabase.child("rating_users").child("b_silver").child(userId).removeValue();
+
+                        } else if (userBookCount >= 20) {
+                            userType = "silver";
+                            userRatingCategory = "b_silver";
+                            mDatabase.child("rating_users").child("c_bronze").child(userId).removeValue();
+
+                        }else{
+                            mDatabase.child("rating_users").child("other").child(userId).removeValue();
+                        }
+
+                        mDatabase.child("user_list").child(userId).child("userType").setValue(userType);
+                    }
+
+                    mDatabase.child("rating_users").child(userRatingCategory).child(userId).child("point").setValue(pointSum);
+
+
 
                     new ReCalcGroupPoints(UserReviewActivity.this).execute();
 
@@ -196,10 +259,12 @@ public class UserReviewActivity extends AppCompatActivity {
 
             }
         });
+
+        Toast.makeText(this, book.getName() + getString(R.string.rated_successfully), Toast.LENGTH_SHORT).show();
 //        finish();
     }
 
-    int groupPointSum =  0;
+    int groupPointSum = 0;
     String TAG = "updateUsersRating";
 
     private class ReCalcGroupPoints extends AsyncTask<Void, Void, Void> {
@@ -214,12 +279,13 @@ public class UserReviewActivity extends AppCompatActivity {
             dialog.setMessage(getString(R.string.re_calc_points));
             dialog.show();
         }
+
         @Override
         protected Void doInBackground(Void... args) {
             mDatabase.child("user_list").orderByChild("group_id").equalTo(user.getGroup_id()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    for(DataSnapshot usersData: dataSnapshot.getChildren()){
+                    for (DataSnapshot usersData : dataSnapshot.getChildren()) {
                         User user = usersData.getValue(User.class);
 
                         assert user != null;
@@ -239,14 +305,14 @@ public class UserReviewActivity extends AppCompatActivity {
             return null;
         }
 
-        public void updateUsersRating(){
+        public void updateUsersRating() {
             Collections.sort(userList, User.userPoint);
-            for(int i = 0; i < userList.size(); i++){
+            for (int i = 0; i < userList.size(); i++) {
                 String uId = userList.get(i).getPhoneNumber();
-                mDatabase.child("user_list").child(uId).child("ratingInGroups").setValue(i+1);
+                mDatabase.child("user_list").child(uId).child("ratingInGroups").setValue(i + 1);
 
-                Log.i(TAG, "userId: "+uId);
-                Log.i(TAG, "ratingInGroups: "+(i+1));
+                Log.i(TAG, "userId: " + uId);
+                Log.i(TAG, "ratingInGroups: " + (i + 1));
             }
 
         }

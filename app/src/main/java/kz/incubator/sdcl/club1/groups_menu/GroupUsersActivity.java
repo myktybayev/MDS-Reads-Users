@@ -10,7 +10,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -46,13 +45,12 @@ import java.util.Calendar;
 import java.util.Collections;
 
 import kz.incubator.sdcl.club1.R;
-import kz.incubator.sdcl.club1.book_list_menu.one_book_fragments.RecyclerItemClickListener;
+import kz.incubator.sdcl.club1.book_list_menu.interfaces.RecyclerItemClickListener;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
 import kz.incubator.sdcl.club1.groups_menu.adapters.UserListAdapter;
 import kz.incubator.sdcl.club1.groups_menu.module.Groups;
-import kz.incubator.sdcl.club1.users_list_menu.AddUser;
 import kz.incubator.sdcl.club1.users_list_menu.GetUsersAsyncTask;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BCOUNT;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_EMAIL;
@@ -66,6 +64,7 @@ import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_PHOTO;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_POINT;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_RAINTING_IN_GROUPS;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_REVIEW_SUM;
+import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_USER_TYPE;
 
 public class GroupUsersActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -83,7 +82,6 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
     SQLiteDatabase sqdb;
     SearchView searchView;
     View view;
-    FloatingActionButton fabBtn;
     ProgressBar progressBar;
     UserListAdapter listAdapter;
     String TABLE_USER = "user_store";
@@ -137,8 +135,7 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         progressLoading = findViewById(R.id.llProgressBar);
-        fabBtn = findViewById(R.id.fabBtn);
-        fabBtn.setOnClickListener(this);
+
 
         searchView = findViewById(R.id.searchView);
         userListCopy = new ArrayList<>();
@@ -187,10 +184,6 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
         userList.addAll(userListCopy);
 
         switch (v.getId()) {
-            case R.id.fabBtn:
-                startActivity(new Intent(GroupUsersActivity.this, AddUser.class));
-                break;
-
             case R.id.sort_name:
 
                 Collections.sort(userList, User.userNameComprator);
@@ -226,7 +219,7 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
     }
 
     public void refreshUsersFromFirebase(String version) {
-        new GetUsersAsyncTask(this, version, mSwipeRefreshLayout, progressLoading).execute();
+        new GetUsersAsyncTask(this, version).execute();
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
@@ -507,6 +500,7 @@ public class GroupUsersActivity extends AppCompatActivity implements View.OnClic
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_GROUP)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_PHOTO)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_ENTER_DATE)),
+                            userCursor.getString(userCursor.getColumnIndex(COLUMN_USER_TYPE)),
                             userCursor.getString(userCursor.getColumnIndex(COLUMN_IMG_STORAGE_NAME)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_BCOUNT)),
                             userCursor.getInt(userCursor.getColumnIndex(COLUMN_POINT)),

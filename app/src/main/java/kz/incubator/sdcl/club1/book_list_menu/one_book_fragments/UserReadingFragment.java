@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,14 +29,15 @@ import java.util.List;
 
 import kz.incubator.sdcl.club1.R;
 import kz.incubator.sdcl.club1.book_list_menu.OneBookAcvitiy;
-import kz.incubator.sdcl.club1.groups_menu.UserProfileActivity;
-import kz.incubator.sdcl.club1.database.StoreDatabase;
 import kz.incubator.sdcl.club1.book_list_menu.interfaces.ItemClickListener;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.book_list_menu.interfaces.RecyclerItemClickListener;
+import kz.incubator.sdcl.club1.database.StoreDatabase;
+import kz.incubator.sdcl.club1.groups_menu.UserProfileActivity;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 public class UserReadingFragment extends Fragment {
 
-    ReadingListAdapter readedListAdapter;
+    ReadingListAdapter readingListAdapter;
     RecyclerView recyclerView;
     private List<User> userList;
     View view;
@@ -47,7 +47,7 @@ public class UserReadingFragment extends Fragment {
     SQLiteDatabase sqdb;
     ProgressBar progressBar;
     TextView checkIsEmpty;
-    String bookId;
+    String userId, bookId, userGroupId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,55 +65,65 @@ public class UserReadingFragment extends Fragment {
     public void initialize() {
         recyclerView = view.findViewById(R.id.recyclerForBook);
         userList = new ArrayList<>();
+
+        if (getArguments() != null) {
+            userId = getArguments().getString("userId");
+            bookId = getArguments().getString("bookId");
+        }
+
         oneBookAcvitiy = new OneBookAcvitiy();
         storeDb = new StoreDatabase(getActivity());
         sqdb = storeDb.getWritableDatabase();
         checkIsEmpty = view.findViewById(R.id.checkIsEmpty);
         progressBar = view.findViewById(R.id.ProgressBar);
 
-
+        userRef = FirebaseDatabase.getInstance().getReference().child("user_list");
         mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("book_list").child(bookId).child("reading");
-        mDatabaseRef.addValueEventListener(new ValueEventListener() {
+        userRef.child(userId).child("group_id").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    userList.clear();
-                    checkIsEmpty.setVisibility(View.GONE);
+                userGroupId = dataSnapshot.getValue().toString();
 
-                    Log.i("UserReadingFragment", "dataSnapshot.exists()");
+                mDatabaseRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            userList.clear();
+                            checkIsEmpty.setVisibility(View.GONE);
 
-                    for (DataSnapshot users : dataSnapshot.getChildren()) {
-                        String userId = users.getKey();
+                            for (DataSnapshot users : dataSnapshot.getChildren()) {
+                                String userId = users.getKey();
 
-                        userRef = FirebaseDatabase.getInstance().getReference().child("user_list").child(userId);
-                        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.exists()) {
+                                userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        User user = dataSnapshot.getValue(User.class);
 
-                                    Log.i("UserReadingFragment", "userRef dataSnapshot.exists()");
-                                    User user = dataSnapshot.getValue(User.class);
-                                    userList.add(user);
+                                        if (user.getGroup_id().equals(userGroupId))
+                                            userList.add(dataSnapshot.getValue(User.class));
 
-                                    Log.i("UserReadingFragment", "user: "+user.getInfo());
+                                        readingListAdapter.notifyDataSetChanged();
+                                    }
 
-                                    readedListAdapter.notifyDataSetChanged();
-                                }
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
                             }
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                        } else {
+                            checkIsEmpty.setVisibility(View.VISIBLE);
+                        }
 
-                            }
-                        });
+                        progressBar.setVisibility(View.GONE);
                     }
 
-                } else {
-                    checkIsEmpty.setVisibility(View.VISIBLE);
-                }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                readedListAdapter.notifyDataSetChanged();
-                progressBar.setVisibility(View.GONE);
+                    }
+                });
             }
 
             @Override
@@ -122,10 +132,10 @@ public class UserReadingFragment extends Fragment {
             }
         });
 
-        readedListAdapter = new ReadingListAdapter(getActivity(), userList);
+        readingListAdapter = new ReadingListAdapter(getActivity(), userList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(readedListAdapter);
+        recyclerView.setAdapter(readingListAdapter);
 
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
@@ -147,16 +157,7 @@ public class UserReadingFragment extends Fragment {
                     }
                 })
         );
-        readedListAdapter.setOnClickListener(new ItemClickListener() {
-            @Override
-            public void onItemClick(View v, int pos) {
-                Intent intent = new Intent(getActivity(), UserProfileActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("user",userList.get(pos));
-                intent.putExtras(bundle);
-                getContext().startActivity(intent);
-            }
-        });
+
     }
 
     public String checkAbone(String ticketDay) {

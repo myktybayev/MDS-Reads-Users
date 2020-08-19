@@ -27,10 +27,10 @@ import java.util.ArrayList;
 import kz.incubator.sdcl.club1.R;
 import kz.incubator.sdcl.club1.book_list_menu.adapters.BookReviewsAdapter;
 import kz.incubator.sdcl.club1.book_list_menu.module.ReviewInUser;
-import kz.incubator.sdcl.club1.book_list_menu.one_book_fragments.RecyclerItemClickListener;
+import kz.incubator.sdcl.club1.book_list_menu.interfaces.RecyclerItemClickListener;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
 import kz.incubator.sdcl.club1.groups_menu.UserReviewCheckActivity;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 public class ReviewsForBookFragment extends Fragment {
     ArrayList<ReviewInUser> reviewList = new ArrayList<>();
@@ -46,7 +46,6 @@ public class ReviewsForBookFragment extends Fragment {
     FirebaseUser currentUser;
     String TAG = "ReviewsForBookFragment";
     User user;
-    String classType;
 
 
     @Override
@@ -71,31 +70,28 @@ public class ReviewsForBookFragment extends Fragment {
         storeDb = new StoreDatabase(getActivity());
         sqdb = storeDb.getWritableDatabase();
 
-        if (!classType.equals("userProfile"))
-            recyclerView.addOnItemTouchListener(
-                    new RecyclerItemClickListener(getActivity(), recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(View view, final int pos) {
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getActivity(), recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, final int pos) {
 
-                            Intent intent = new Intent(getActivity(), UserReviewCheckActivity.class);
+                        Intent intent = new Intent(getActivity(), UserReviewCheckActivity.class);
 
-                            Bundle bundle = new Bundle();
-                            Log.i(TAG, "reviewList text: " + reviewList.get(pos).getBook_id());
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("userReview", reviewList.get(pos));
+                        bundle.putSerializable("user", user);
+                        intent.putExtras(bundle);
 
-                            bundle.putSerializable("userReview", reviewList.get(pos));
-                            bundle.putSerializable("user", user);
-                            intent.putExtras(bundle);
+                        startActivityForResult(intent, 101);
 
-                            startActivityForResult(intent, 101);
+                    }
 
-                        }
+                    @Override
+                    public void onLongItemClick(View view, int position) {
 
-                        @Override
-                        public void onLongItemClick(View view, int position) {
-
-                        }
-                    })
-            );
+                    }
+                })
+        );
     }
 
     public void initUserId() {
@@ -103,23 +99,14 @@ public class ReviewsForBookFragment extends Fragment {
         userId = "";
 
         if (bundle != null) {
-            classType = bundle.getString("class");
+            currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-            if (classType != null && classType.equals("myCabinet")) {
-
-                currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-                if (currentUser.getPhoneNumber() != null && currentUser.getPhoneNumber().length() > 0) { // phone login
-                    userId = currentUser.getPhoneNumber();
-                } else {
-                    userId = currentUser.getDisplayName();
-                }
-                user = (User) bundle.getSerializable("user");
-
-            } else if (classType != null && classType.equals("userProfile")) {
-                user = (User) bundle.getSerializable("user");
-                userId = user.getPhoneNumber();
+            if (currentUser.getPhoneNumber() != null && currentUser.getPhoneNumber().length() > 0) { // phone login
+                userId = currentUser.getPhoneNumber();
+            } else {
+                userId = currentUser.getDisplayName();
             }
+            user = (User) bundle.getSerializable("user");
         }
 
         Log.i(TAG, "userId: " + userId);

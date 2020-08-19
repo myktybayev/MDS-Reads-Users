@@ -8,12 +8,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import kz.incubator.sdcl.club1.book_list_menu.module.Book;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 public class StoreDatabase extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "reading_club.db";
-    private static final int DATABASE_VERSION = 24;
+    private static final int DATABASE_VERSION = 27;
 
     public static final String TABLE_USER = "user_store";
     public static final String TABLE_BOOKS = "book_store";
@@ -30,6 +30,7 @@ public class StoreDatabase extends SQLiteOpenHelper {
     public static final String COLUMN_POINT = "point";
     public static final String COLUMN_REVIEW_SUM = "review_sum";
     public static final String COLUMN_RAINTING_IN_GROUPS = "ratingInGroups";
+    public static final String COLUMN_USER_TYPE = "userType";
 
     public static final String TABLE_VER = "versions";
     public static final String COLUMN_USER_VER = "user_ver";
@@ -64,6 +65,7 @@ public class StoreDatabase extends SQLiteOpenHelper {
                 COLUMN_GROUP_ID + " TEXT, " +
                 COLUMN_PHOTO + " TEXT, " +
                 COLUMN_ENTER_DATE + " TEXT, " +
+                COLUMN_USER_TYPE + " TEXT, " +
                 COLUMN_BCOUNT + " INTEGER , " +
                 COLUMN_POINT + " INTEGER , " +
                 COLUMN_REVIEW_SUM + " INTEGER , " +
@@ -113,7 +115,7 @@ public class StoreDatabase extends SQLiteOpenHelper {
 
     }
 
-    public Cursor getSinlgeEntry(String phoneNumber) {
+    public Cursor getUserEntry(String phoneNumber) {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("SELECT * FROM " + TABLE_USER + " WHERE " +
                 COLUMN_PHONE + "=?", new String[]{phoneNumber});
@@ -170,6 +172,7 @@ public class StoreDatabase extends SQLiteOpenHelper {
         updateValues.put(COLUMN_GROUP_ID, user.getGroup_id());
         updateValues.put(COLUMN_PHONE, user.getPhoneNumber());
         updateValues.put(COLUMN_ENTER_DATE, user.getEnterDate());
+        updateValues.put(COLUMN_USER_TYPE, user.getUserType());
         updateValues.put(COLUMN_POINT, user.getPoint());
         updateValues.put(COLUMN_REVIEW_SUM, user.getReview_sum());
         updateValues.put(COLUMN_RAINTING_IN_GROUPS, user.getRatingInGroups());

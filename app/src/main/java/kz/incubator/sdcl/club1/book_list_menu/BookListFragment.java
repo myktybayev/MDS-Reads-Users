@@ -2,11 +2,9 @@ package kz.incubator.sdcl.club1.book_list_menu;
 
 import android.app.AlertDialog;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -24,7 +22,6 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -41,10 +38,9 @@ import java.util.Collections;
 
 import kz.incubator.sdcl.club1.R;
 import kz.incubator.sdcl.club1.book_list_menu.adapters.BookListAdapter;
-import kz.incubator.sdcl.club1.database.StoreDatabase;
 import kz.incubator.sdcl.club1.book_list_menu.module.Book;
+import kz.incubator.sdcl.club1.database.StoreDatabase;
 
-import static kz.incubator.sdcl.club1.MenuActivity.isAdmin;
 import static kz.incubator.sdcl.club1.MenuActivity.setTitle;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BAUTHOR;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BDESC;
@@ -68,9 +64,8 @@ public class BookListFragment extends Fragment implements View.OnClickListener{
     View rootView;
     StoreDatabase storeDb;
     SQLiteDatabase sqdb;
-    FloatingActionButton fabBtn;
     SwipeRefreshLayout mSwipeRefreshLayout;
-    ProgressBar progressBar;
+//    ProgressBar progressBar;
     Book book;
     SearchView searchView;
     Switch filterSwitch;
@@ -147,20 +142,7 @@ public class BookListFragment extends Fragment implements View.OnClickListener{
         storeDb = new StoreDatabase(getActivity());
         sqdb = storeDb.getWritableDatabase();
 
-        fabBtn = rootView.findViewById(R.id.fabBtn);
-
-        if(!isAdmin()){
-            fabBtn.setVisibility(View.GONE);
-        }
-
-        fabBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getActivity(), AddBook.class));
-            }
-        });
-
-        progressBar = rootView.findViewById(R.id.ProgressBar);
+//        progressBar = rootView.findViewById(R.id.ProgressBar);
         addBookChangeListener();
         sortDialog();
     }

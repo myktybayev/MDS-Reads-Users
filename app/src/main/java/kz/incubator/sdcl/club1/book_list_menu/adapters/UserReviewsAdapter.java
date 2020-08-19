@@ -70,6 +70,7 @@ public class UserReviewsAdapter extends RecyclerView.Adapter<UserReviewsAdapter.
         Glide.with(context.getApplicationContext())
                 .load(review.getUser().getPhoto())
                 .placeholder(R.drawable.user_def)
+                .dontAnimate()
                 .into(holder.person_photo);
 
         holder.review_text.setText("\"" + review.getReview_text() + "\"");

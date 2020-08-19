@@ -27,7 +27,7 @@ import java.util.Date;
 import kz.incubator.sdcl.club1.R;
 import kz.incubator.sdcl.club1.book_list_menu.adapters.RecommendationBookListAdapter;
 import kz.incubator.sdcl.club1.book_list_menu.module.Book;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 
 public class RecommendationBookListFragment extends Fragment {
@@ -41,7 +41,6 @@ public class RecommendationBookListFragment extends Fragment {
     ArrayList<String> keys = new ArrayList<>();
     String userId;
     FirebaseUser currentUser;
-    String classType;
 
     public RecommendationBookListFragment() {
 
@@ -64,21 +63,12 @@ public class RecommendationBookListFragment extends Fragment {
         userId = "";
 
         if (bundle != null) {
-            classType = bundle.getString("class");
+            currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-            if (classType != null && classType.equals("myCabinet")) {
-
-                currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-                if (currentUser.getPhoneNumber() != null && currentUser.getPhoneNumber().length() > 0) { // phone login
-                    userId = currentUser.getPhoneNumber();
-                } else {
-                    userId = currentUser.getDisplayName();
-                }
-
-            } else if (classType != null && classType.equals("userProfile")) {
-                user = (User) bundle.getSerializable("user");
-                userId = user.getPhoneNumber();
+            if (currentUser.getPhoneNumber() != null && currentUser.getPhoneNumber().length() > 0) { // phone login
+                userId = currentUser.getPhoneNumber();
+            } else {
+                userId = currentUser.getDisplayName();
             }
         }
     }
@@ -93,9 +83,6 @@ public class RecommendationBookListFragment extends Fragment {
 
     public void initializeFloatingActionButton() {
         fab = view.findViewById(R.id.fab);
-
-        if (classType.equals("userProfile")) fab.setVisibility(View.INVISIBLE);
-
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

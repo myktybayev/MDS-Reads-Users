@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import kz.incubator.sdcl.club1.R;
 import kz.incubator.sdcl.club1.book_list_menu.adapters.UserReviewsAdapter;
 import kz.incubator.sdcl.club1.book_list_menu.module.ReviewInBook;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 public class UserReviewsFragment extends Fragment {
     ArrayList<ReviewInBook> reviewList = new ArrayList<>();
@@ -31,7 +31,7 @@ public class UserReviewsFragment extends Fragment {
     DatabaseReference mDatabase, userRef;
     ProgressBar progressBar;
     TextView checkIsEmpty;
-    String bookId;
+    String userId, bookId, userGroupId;
 
 
     @Override
@@ -52,59 +52,74 @@ public class UserReviewsFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(reviewAdapter);
 
-        if(getArguments() != null){
+        if (getArguments() != null) {
+            userId = getArguments().getString("userId");
             bookId = getArguments().getString("bookId");
         }
 
 
-        userRef = FirebaseDatabase.getInstance().getReference().child("user_list");
-
     }
 
     public void getReviews() {
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("book_list").child(bookId).child("reviews").addValueEventListener(new ValueEventListener() {
+        userRef = FirebaseDatabase.getInstance().getReference().child("user_list");
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("book_list").child(bookId).child("reviews");
+
+        userRef.child(userId).child("group_id").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                reviewList.clear();
-                if (dataSnapshot.exists()) {
+                userGroupId = dataSnapshot.getValue().toString();
 
-                    checkIsEmpty.setVisibility(View.GONE);
-                    for (DataSnapshot reviews : dataSnapshot.getChildren()) {
+                mDatabase.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        reviewList.clear();
+                        if (dataSnapshot.exists()) {
 
-                        String userId = reviews.child("user_id").getValue().toString();
-                        final String fKey = reviews.child("fKey").getValue().toString();
-                        final String review_text = reviews.child("review_text").getValue().toString();
-                        final int user_rate = Integer.parseInt(reviews.child("user_rate").getValue().toString());
+                            checkIsEmpty.setVisibility(View.GONE);
+                            for (DataSnapshot reviews : dataSnapshot.getChildren()) {
+
+                                String userId = reviews.child("user_id").getValue().toString();
+                                final String fKey = reviews.child("fKey").getValue().toString();
+                                final String review_text = reviews.child("review_text").getValue().toString();
+                                final int user_rate = Integer.parseInt(reviews.child("user_rate").getValue().toString());
 
 
-                        userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if(dataSnapshot.exists()){
-                                    User userData = dataSnapshot.getValue(User.class);
+                                userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.exists()) {
+                                            User userData = dataSnapshot.getValue(User.class);
 
-                                    ReviewInBook reviewInUser = new ReviewInBook(fKey, userData, user_rate, review_text);
-                                    reviewList.add(reviewInUser);
-                                    reviewAdapter.notifyDataSetChanged();
-                                }
+                                            if (userData.getGroup_id().equals(userGroupId)) {
+                                                ReviewInBook reviewInUser = new ReviewInBook(fKey, userData, user_rate, review_text);
+                                                reviewList.add(reviewInUser);
+                                                reviewAdapter.notifyDataSetChanged();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
                             }
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                            progressBar.setVisibility(View.GONE);
 
-                            }
-                        });
+                        } else {
+                            checkIsEmpty.setVisibility(View.VISIBLE);
+                        }
+
+                        reviewAdapter.notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
                     }
 
-                    progressBar.setVisibility(View.GONE);
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                } else {
-                    checkIsEmpty.setVisibility(View.VISIBLE);
-                }
-
-                reviewAdapter.notifyDataSetChanged();
-                progressBar.setVisibility(View.GONE);
+                    }
+                });
             }
 
             @Override
@@ -112,6 +127,7 @@ public class UserReviewsFragment extends Fragment {
 
             }
         });
+
 
     }
 

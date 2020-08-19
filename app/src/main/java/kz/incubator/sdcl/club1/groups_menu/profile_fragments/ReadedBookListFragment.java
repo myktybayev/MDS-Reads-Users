@@ -31,7 +31,7 @@ import kz.incubator.sdcl.club1.book_list_menu.interfaces.ItemClickListener;
 import kz.incubator.sdcl.club1.book_list_menu.module.Book;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
 import kz.incubator.sdcl.club1.users_list_menu.adapters.UserBookListAdapterForReaded;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BAUTHOR;
 import static kz.incubator.sdcl.club1.database.StoreDatabase.COLUMN_BDESC;
@@ -97,25 +97,15 @@ public class ReadedBookListFragment extends Fragment {
     User user;
     public void initUserId() {
         Bundle bundle = this.getArguments();
-        String classType;
         userId = "";
 
         if (bundle != null) {
-            classType = bundle.getString("class");
+            currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-            if (classType != null && classType.equals("myCabinet")) {
-
-                currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-                if (currentUser.getPhoneNumber() != null && currentUser.getPhoneNumber().length() > 0) { // phone login
-                    userId = currentUser.getPhoneNumber();
-                } else {
-                    userId = currentUser.getDisplayName();
-                }
-
-            } else if (classType != null && classType.equals("userProfile")) {
-                user = (User) bundle.getSerializable("user");
-                userId = user.getPhoneNumber();
+            if (currentUser.getPhoneNumber() != null && currentUser.getPhoneNumber().length() > 0) { // phone login
+                userId = currentUser.getPhoneNumber();
+            } else {
+                userId = currentUser.getDisplayName();
             }
         }
     }

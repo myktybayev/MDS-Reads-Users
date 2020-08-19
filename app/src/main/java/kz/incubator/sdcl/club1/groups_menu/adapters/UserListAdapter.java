@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import de.hdodenhof.circleimageview.CircleImageView;
 import kz.incubator.sdcl.club1.R;
 import kz.incubator.sdcl.club1.book_list_menu.interfaces.ItemClickListener;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.MyTViewHolder>{
     private Context context;

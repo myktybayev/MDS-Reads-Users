@@ -14,7 +14,7 @@ import kz.incubator.sdcl.club1.R;
 public class AboutUsFragment extends Fragment {
     View view;
     GridView gridView;
-    ArrayList<Moderator> Moderators = new ArrayList<>();
+    ArrayList<Moderator> moderators = new ArrayList<>();
     ModeratorsAdapter adapter;
 
     public AboutUsFragment() {
@@ -29,16 +29,17 @@ public class AboutUsFragment extends Fragment {
         return view;
     }
 
-    public void initGrid(){
+    public void initGrid() {
         initializeWidgets();
-        adapter = new ModeratorsAdapter(getActivity(), Moderators);
+        adapter = new ModeratorsAdapter(getActivity(), moderators);
         gridView.setAdapter(adapter);
     }
 
-    public void initializeWidgets(){
-        Moderators.add(new Moderator(R.drawable.girl,"Zamira Akkulova\n+77075050713","CEO Rent Books",R.color.second));
-        Moderators.add(new Moderator(R.drawable.girl,"Girl 1\n+77075050713","IT support",R.color.first));
-        Moderators.add(new Moderator(R.drawable.girl,"Girl 2\n+77075050713","Moderator",R.color.first));
-        Moderators.add(new Moderator(R.drawable.girl,"Girl 3\n+77075050713","Moderator",R.color.first));
+    public void initializeWidgets() {
+        moderators.add(new Moderator(R.drawable.user_photo, "Arafat Nurlakov",      getString(R.string.ceo_mds_program), R.color.second));
+        moderators.add(new Moderator(R.drawable.user_photo, "Zhiger Telyukanov",    getString(R.string.ceo_mds_reads), R.color.second));
+        moderators.add(new Moderator(R.drawable.user_photo, "Bakhytzhan Myktybayev",getString(R.string.project_developer), R.color.first));
+        moderators.add(new Moderator(R.drawable.user_photo, "Adilet Amangossov",    getString(R.string.project_manager), R.color.first));
+        moderators.add(new Moderator(R.drawable.user_photo, "Bakhtyar Madeniyet",   getString(R.string.project_manager), R.color.first));
     }
 }

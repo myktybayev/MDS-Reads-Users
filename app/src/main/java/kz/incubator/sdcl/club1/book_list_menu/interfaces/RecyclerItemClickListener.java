@@ -1,4 +1,4 @@
-package kz.incubator.sdcl.club1.book_list_menu.one_book_fragments;
+package kz.incubator.sdcl.club1.book_list_menu.interfaces;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

@@ -41,7 +41,7 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import kz.incubator.sdcl.club1.R;
-import kz.incubator.sdcl.club1.book_list_menu.one_book_fragments.RecyclerItemClickListener;
+import kz.incubator.sdcl.club1.book_list_menu.interfaces.RecyclerItemClickListener;
 import kz.incubator.sdcl.club1.database.StoreDatabase;
 import kz.incubator.sdcl.club1.groups_menu.adapters.GroupListAdapter;
 import kz.incubator.sdcl.club1.groups_menu.module.Groups;
@@ -236,7 +236,7 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
     }
 
     public void refreshUsersFromFirebase(String version) {
-        new GetUsersAsyncTask(getActivity(), version, mSwipeRefreshLayout, progressLoading).execute();
+        new GetUsersAsyncTask(getActivity(), version).execute();
     }
 
     public void setupSwipeRefresh() {

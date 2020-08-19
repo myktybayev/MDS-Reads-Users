@@ -5,7 +5,7 @@ import android.widget.Filter;
 import java.util.ArrayList;
 
 import kz.incubator.sdcl.club1.groups_menu.adapters.UserListAdapter;
-import kz.incubator.sdcl.club1.users_list_menu.module.User;
+import kz.incubator.sdcl.club1.groups_menu.module.User;
 
 public class CustomFilter extends Filter {
     UserListAdapter adapter;
